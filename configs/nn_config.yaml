@@ -1,0 +1,203 @@
+# 🤖 ROBOT NAVIGATION NEURAL NETWORK CONFIGURATION
+# ================================================
+# 
+# This configuration file defines all hyperparameters and settings
+# for the neural network used in robot navigation.
+
+# =============================================================================
+# NEURAL NETWORK ARCHITECTURE
+# =============================================================================
+
+# Model Architecture
+model:
+  input_size: 9              # 3×3 perception grid (flattened)
+  hidden1_size: 64           # First hidden layer neurons
+  hidden2_size: 32           # Second hidden layer neurons  
+  output_size: 4             # 4 navigation actions (UP, DOWN, LEFT, RIGHT)
+  
+  # Activation functions
+  hidden_activation: "relu"  # ReLU for hidden layers
+  output_activation: "softmax"  # Softmax for output layer
+  
+  # Regularization
+  dropout_rate: 0.2          # Dropout rate for regularization
+  weight_decay: 0.0          # L2 regularization (not used in this implementation)
+
+# =============================================================================
+# TRAINING HYPERPARAMETERS
+# =============================================================================
+
+training:
+  # Optimization
+  learning_rate: 0.001       # Initial learning rate
+  batch_size: 32             # Mini-batch size
+  epochs: 100                # Maximum number of epochs
+  
+  # Early stopping
+  early_stopping:
+    enabled: true
+    patience: 15             # Epochs to wait before stopping
+    monitor: "val_loss"      # Metric to monitor
+    min_delta: 0.001         # Minimum change to qualify as improvement
+  
+  # Learning rate scheduling (future enhancement)
+  lr_scheduler:
+    enabled: false
+    type: "step"             # "step", "exponential", "cosine"
+    step_size: 30
+    gamma: 0.1
+
+# =============================================================================
+# DATA SPLITTING
+# =============================================================================
+
+data:
+  # Split ratios
+  train_ratio: 0.8           # 80% for training
+  val_ratio: 0.1             # 10% for validation
+  test_ratio: 0.1            # 10% for testing
+  
+  # Data preprocessing
+  normalize: false           # No normalization needed (binary 0/1 values)
+  shuffle: true              # Shuffle data before splitting
+  random_seed: 42            # For reproducible splits
+
+# =============================================================================
+# MODEL PERSISTENCE
+# =============================================================================
+
+model_save:
+  # File paths
+  model_dir: "data/models/final_models"
+  model_filename: "robot_navigation_nn.pkl"
+  history_filename: "training_history.png"
+  
+  # Save options
+  save_best_only: true       # Save only the best model (based on validation loss)
+  save_weights_only: false   # Save full model (weights + architecture)
+  save_history: true         # Save training history plots
+
+# =============================================================================
+# EVALUATION METRICS
+# =============================================================================
+
+evaluation:
+  # Metrics to compute
+  metrics:
+    - "accuracy"             # Classification accuracy
+    - "loss"                 # Cross-entropy loss
+    - "confusion_matrix"     # Confusion matrix
+    - "classification_report"  # Detailed classification report
+  
+  # Action mapping
+  action_names:
+    - "UP"                   # Action 0
+    - "DOWN"                 # Action 1  
+    - "LEFT"                 # Action 2
+    - "RIGHT"                # Action 3
+
+# =============================================================================
+# VISUALIZATION SETTINGS
+# =============================================================================
+
+visualization:
+  # Training plots
+  plot_training_history: true
+  plot_confusion_matrix: true
+  plot_architecture: true
+  
+  # Plot settings
+  figure_size: [12, 5]       # Width, height in inches
+  dpi: 300                   # Resolution for saved plots
+  style: "seaborn-v0_8"      # Matplotlib style
+  
+  # Colors
+  colors:
+    train: "blue"
+    validation: "red"
+    test: "green"
+
+# =============================================================================
+# LOGGING AND MONITORING
+# =============================================================================
+
+logging:
+  # Logging level
+  level: "INFO"              # DEBUG, INFO, WARNING, ERROR
+  
+  # Log files
+  log_dir: "data/results/logs"
+  log_filename: "training.log"
+  
+  # Console output
+  print_every_n_epochs: 10   # Print progress every N epochs
+  verbose: true              # Detailed output during training
+
+# =============================================================================
+# EXPERIMENTAL SETTINGS
+# =============================================================================
+
+experiments:
+  # Hyperparameter tuning
+  hyperparameter_tuning:
+    enabled: false           # Set to true to run hyperparameter tuning
+    param_grid:
+      learning_rate: [0.001, 0.01, 0.1]
+      dropout_rate: [0.1, 0.2, 0.3]
+      hidden1_size: [32, 64, 128]
+      hidden2_size: [16, 32, 64]
+  
+  # Architecture comparison
+  architecture_comparison:
+    enabled: false           # Set to true to compare architectures
+    architectures:
+      - name: "Small"
+        hidden1_size: 32
+        hidden2_size: 16
+      - name: "Medium" 
+        hidden1_size: 64
+        hidden2_size: 32
+      - name: "Large"
+        hidden1_size: 128
+        hidden2_size: 64
+
+# =============================================================================
+# BIOLOGICAL INSPIRATION NOTES
+# =============================================================================
+
+biological_notes: |
+  🧠 BIOLOGICAL CONNECTIONS:
+  
+  - Local Perception: 3×3 grid mimics animal peripheral vision
+  - ReLU Activation: Mimics spiking neurons (active/silent states)
+  - Dropout: Simulates neural noise and robustness
+  - Softmax: Mimics neural competition for activation
+  - Pattern Learning: Robot learns obstacle-action relationships
+  
+  🧬 NEUROSCIENCE PRINCIPLES:
+  
+  - Sparse Activation: ReLU creates sparse representations
+  - Gradient Flow: ReLU prevents vanishing gradients
+  - Regularization: Dropout prevents overfitting
+  - Competition: Softmax ensures only one action is selected
+  - Learning: Backpropagation mimics synaptic plasticity
+
+# =============================================================================
+# MATHEMATICAL FOUNDATION
+# =============================================================================
+
+mathematical_notes: |
+  📐 KEY EQUATIONS:
+  
+  - ReLU: f(x) = max(0, x)
+  - Softmax: p_i = exp(z_i) / Σ exp(z_j)
+  - Cross-entropy: L = -Σ y_i log(p_i)
+  - Dropout: x' = x * mask / (1-p)
+  - Xavier Init: std = sqrt(2 / (fan_in + fan_out))
+  
+  🎯 OPTIMIZATION:
+  
+  - Gradient Descent: θ = θ - α∇L
+  - Mini-batch: Process data in small batches
+  - Early Stopping: Prevent overfitting
+  - Regularization: Dropout for generalization

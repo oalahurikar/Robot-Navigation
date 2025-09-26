@@ -1,0 +1,83 @@
+---
+alwaysApply: true
+description: Project planning and development workflow
+---
+
+# Project Planning and Development Rules
+
+## Step-by-Step Development Process
+
+### 1. Project Initiation Phase
+- **Define the core problem**: Clearly articulate what you're trying to solve or learn
+- **Set learning objectives**: What fundamental concepts will you explore?
+- **Choose appropriate complexity**: Start simple, build incrementally
+- **Establish success criteria**: How will you know when you've achieved your goals?
+
+### 2. Research and Understanding Phase
+- **Biological inspiration**: When applicable, research relevant neuroscience concepts
+- **Mathematical foundations**: Understand the underlying mathematics before coding
+- **Existing implementations**: Study similar projects to avoid reinventing the wheel
+- **Document insights**: Create notes in the [Documents/](mdc:docs/) directory
+
+### 3. Design Phase
+- **Modular architecture**: Break the project into logical, testable components
+- **Data flow design**: Plan how information moves through your system
+- **Interface definitions**: Define clear boundaries between components
+- **Testing strategy**: Plan how you'll validate each component and the whole system
+
+### 4. Implementation Phase
+- **Incremental development**: Build and test one component at a time
+- **Document as you code**: Explain the "why" behind each implementation choice
+- **Version control**: Commit working versions frequently with descriptive messages
+- **Visualization**: Create plots and animations to understand system behavior
+
+### 5. Validation and Refinement Phase
+- **Test edge cases**: Verify behavior with unexpected inputs
+- **Performance analysis**: Measure and optimize computational efficiency
+- **Compare with alternatives**: Test different approaches or parameters
+- **Document learnings**: Update notes with insights gained during implementation
+
+### 6. Documentation and Sharing Phase
+- **Clear explanations**: Write documentation that explains concepts to others
+- **Practical examples**: Provide working code with clear usage instructions
+- **Visual aids**: Create diagrams, animations, or plots to illustrate concepts
+- **Future improvements**: Document potential enhancements or variations
+
+## Project Structure Standards
+
+### Directory Organization
+- **Development/**: Active coding projects and experiments
+- **Intelligence/**: Research notes and concept documentation
+- **media/**: Visualizations, animations, and supporting materials
+- **Self_Evolving_Agent/**: Advanced projects and autonomous systems
+
+### File Naming Conventions
+- Use descriptive names that indicate purpose and iteration
+- Include version numbers for significant iterations (day1_, day2_, etc.)
+- Use consistent extensions (.py for code, .ipynb for experiments, .md for notes)
+
+### Code Organization
+- Start each file with a clear header explaining the purpose
+- Use section dividers to organize related functionality
+- Include docstrings explaining the biological/mathematical inspiration
+- Add inline comments explaining complex logic or mathematical concepts
+
+## Quality Assurance
+
+### Code Quality
+- Follow the principle of simplicity over complexity [[memory:2109193]]
+- Implement comprehensive error handling
+- Use type hints for better code clarity
+- Include unit tests for core functionality
+
+### Documentation Quality
+- Explain the "why" behind design decisions
+- Connect artificial implementations to biological inspiration
+- Provide practical examples and use cases
+- Include mathematical intuition where relevant
+
+### Testing Strategy
+- Test individual components in isolation
+- Validate end-to-end system behavior
+- Use visualization to verify expected behavior
+- Compare results with known theoretical outcomes

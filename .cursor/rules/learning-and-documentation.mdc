@@ -1,0 +1,203 @@
+---
+alwaysApply: true
+description: Learning methodology and documentation standards
+---
+
+# Learning and Documentation Standards
+
+## Learning Methodology
+
+### Step-by-Step Learning Approach
+1. **Biological Foundation**: Start with neuroscience concepts 
+2. **Mathematical Understanding**: Grasp the underlying mathematics
+3. **Implementation**: Build working code with clear explanations
+4. **Visualization**: Create plots and animations to understand behavior
+5. **Analysis**: Document insights and connections to biological systems
+6. **Iteration**: Refine understanding through experimentation
+
+### Critical Thinking Development
+- **Question Everything**: Ask "Why?" at each step
+- **Connect Concepts**: Link artificial implementations to biological inspiration
+- **Test Assumptions**: Validate theoretical understanding through experimentation
+- **Seek Patterns**: Look for common principles across different AI domains
+- **Document Insights**: Record "aha!" moments and breakthrough understanding
+
+## Documentation Standards
+
+### Research Notes Structure
+When creating notes in:
+
+```markdown
+# [Concept Name]
+
+## Biological Foundation
+- How this works in the brain
+- Key neuroscience research
+- Evolutionary advantages
+
+## Mathematical Basis
+- Core equations and formulas
+- Key assumptions and limitations
+- Computational complexity
+
+## AI Implementation
+- How to implement in code
+- Practical considerations
+- Common pitfalls and solutions
+
+## Applications and Examples
+- Real-world use cases
+- Connection to other AI concepts
+- Future research directions
+
+## Questions for Further Exploration
+- What don't we understand yet?
+- How does this connect to other concepts?
+- What experiments could deepen understanding?
+```
+
+### Code Documentation Standards
+```python
+"""
+🧠 PROJECT: [Project Name]
+==========================
+
+Biological Inspiration:
+[Explain the neuroscience connection]
+
+Mathematical Foundation:
+[Key mathematical concepts]
+
+Learning Objective:
+[What you'll understand after this project]
+
+Implementation Notes:
+[Important design decisions and why]
+"""
+
+# =============================================================================
+# BIOLOGICAL BACKGROUND
+# =============================================================================
+# [Explain relevant neuroscience concepts]
+
+# =============================================================================
+# MATHEMATICAL FOUNDATION  
+# =============================================================================
+# [Explain key equations and concepts]
+
+# =============================================================================
+# IMPLEMENTATION
+# =============================================================================
+# [Actual code implementation]
+```
+
+## Knowledge Integration
+
+### Cross-Reference System
+- Link related concepts across different files
+- Use consistent terminology across projects
+- Build a web of interconnected understanding
+- Reference relevant files using `[filename](mdc:path/to/file)`
+
+### Concept Mapping
+Create visual or textual maps showing:
+- How concepts connect to each other
+- Prerequisites for understanding new concepts
+- Applications across different domains
+- Evolutionary relationships between ideas
+
+## Experimentation Guidelines
+
+### Hypothesis-Driven Development
+1. **Form Hypothesis**: What do you expect to happen?
+2. **Design Experiment**: How will you test your hypothesis?
+3. **Implement**: Build the experimental setup
+4. **Execute**: Run the experiment and collect data
+5. **Analyze**: Interpret results in context of hypothesis
+6. **Document**: Record findings and new questions
+
+### Iterative Refinement
+```python
+def iterative_learning_process():
+    """
+    Example of how to structure iterative learning
+    
+    Biological Connection: Mimics how brains learn through repetition
+    Mathematical Basis: Convergence through iterative improvement
+    """
+    for iteration in range(max_iterations):
+        # 1. Make prediction
+        prediction = model(input_data)
+        
+        # 2. Compare with target
+        error = target - prediction
+        
+        # 3. Learn from error (biological: synaptic plasticity)
+        model.update_weights(error)
+        
+        # 4. Document progress
+        if iteration % 100 == 0:
+            print(f"Iteration {iteration}: Error = {error:.6f}")
+            
+        # 5. Check for convergence
+        if abs(error) < tolerance:
+            print(f"✅ Converged after {iteration} iterations")
+            break
+```
+
+## Quality Assurance
+
+### Understanding Validation
+- **Explain to Others**: Can you clearly explain the concept?
+- **Apply to New Problems**: Can you use the concept in different contexts?
+- **Connect to Fundamentals**: Can you trace back to first principles?
+- **Identify Limitations**: Do you understand when the concept breaks down?
+
+### Documentation Quality Checklist
+- [ ] Clear biological inspiration explained
+- [ ] Mathematical foundation documented
+- [ ] Code is well-commented and structured
+- [ ] Visualizations help understanding
+- [ ] Connections to other concepts noted
+- [ ] Questions for further exploration listed
+- [ ] Practical examples provided
+
+## Learning Progression
+
+### Beginner Level
+- Focus on single concepts in isolation
+- Use simple, clear examples
+- Emphasize biological intuition
+- Build basic implementations
+
+### Intermediate Level
+- Connect multiple concepts together
+- Explore parameter variations
+- Understand trade-offs and limitations
+- Build more complex systems
+
+### Advanced Level
+- Integrate concepts across domains
+- Develop novel approaches
+- Contribute to broader understanding
+- Mentor others in learning
+
+## Continuous Improvement
+
+### Regular Review Process
+1. **Weekly Review**: What did you learn this week?
+2. **Monthly Synthesis**: How do new concepts connect to existing knowledge?
+3. **Quarterly Assessment**: What areas need deeper exploration?
+4. **Annual Planning**: What major learning goals for the next year?
+
+### Knowledge Gaps Identification
+- What concepts are you avoiding because they seem difficult?
+- Where do you feel your understanding is superficial?
+- What connections between concepts are you missing?
+- How can you strengthen your weakest areas?
+
+### Community Learning
+- Share insights with others
+- Seek feedback on your understanding
+- Collaborate on complex problems
+- Contribute to collective knowledge base

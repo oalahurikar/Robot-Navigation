@@ -1,0 +1,102 @@
+---
+alwaysApply: true
+description: Project structure and organization guidelines for the 2D Point-Robot Navigator project
+---
+
+# Project Structure Guide
+
+This project follows a modular structure optimized for AI/ML development with clear separation of concerns.
+
+## **Core Architecture**
+
+### **`core/` - The Brain of the Project**
+Contains reusable modules that form the foundation of the system:
+
+### **`scripts/` - Executable Operations**
+Command-line tools for common operations:
+
+### **`tests/` - Quality Assurance**
+Comprehensive testing following the same structure as core modules:
+
+### **`configs/` - Configuration Management**
+Parameter files for different components:
+
+### **`notebooks/` - Interactive Development**
+Jupyter notebooks for exploration and analysis:
+
+### **`docs/` - Documentation**
+Project documentation and guides:
+
+## **File Organization Principles**
+
+### **1. Single Responsibility**
+- Each file has one clear purpose
+- Core modules contain related functionality
+- Scripts orchestrate core modules
+- Tests verify specific functionality
+
+### **2. Clear Dependencies**
+- Scripts depend on core modules
+- Core modules are independent
+- Tests are isolated and focused
+- No circular dependencies
+
+### **3. Scalable Structure**
+- Easy to add new core modules
+- Simple to create new scripts
+- Straightforward to add tests
+- Clear separation of concerns
+
+## **Development Workflow**
+
+### **Adding New Features**
+1. **Core Module**: Add functionality to appropriate core module
+2. **Tests**: Add corresponding tests
+3. **Scripts**: Create script if needed for command-line access
+4. **Documentation**: Update relevant docs
+
+### **Testing Strategy**
+- **Unit Tests**: Test individual functions and classes
+- **Integration Tests**: Test module interactions
+- **End-to-End Tests**: Test complete workflows
+- **Performance Tests**: Test system performance
+
+### **Code Quality**
+- **Type Hints**: All functions have proper type annotations
+- **Docstrings**: All classes and functions documented
+- **Error Handling**: Comprehensive error handling
+- **Logging**: Appropriate logging for debugging
+
+## README Maintenance
+
+### Automatic Updates
+The project README should be updated when:
+- New core modules are added
+- New scripts are created
+- New test files are added
+- New configuration files are added
+- New notebooks are created
+- Project status changes (completed phases)
+- New documentation is added
+
+### README Structure Guidelines
+- Keep **Project Overview** concise and focused
+- Update **Project Structure** when directories change
+- Maintain **Quick Start** with current commands
+- Update **Current Status** as phases complete
+- Keep **Biological Connections** relevant to current implementation
+- Ensure **Development** section reflects current architecture
+
+### Status Tracking
+Update the **Current Status** section when:
+- ✅ Phase completed
+- 🔄 Phase in progress  
+- ⏳ Phase planned
+- ❌ Phase blocked
+
+### File References
+Use relative paths for documentation links:
+- `docs/data_generation_pipeline.md`
+- `data/README.md`
+- `.cursor/rules/project-structure.mdc`
+
