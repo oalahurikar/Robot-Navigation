@@ -1,0 +1,33 @@
+# Data Generation Configuration
+# =============================
+
+# Grid World Settings
+grid_size: 10
+obstacle_density_range: [0.1, 0.4]  # Min and max obstacle density
+min_path_length: 5
+max_path_length: 50
+
+# Generation Settings
+num_environments: 1000
+max_generation_attempts: 100
+
+# Dataset Sizes
+small_dataset:
+  num_environments: 100
+  obstacle_density_range: [0.1, 0.3]
+  max_path_length: 25
+
+medium_dataset:
+  num_environments: 500
+  obstacle_density_range: [0.1, 0.35]
+  max_path_length: 30
+
+large_dataset:
+  num_environments: 1000
+  obstacle_density_range: [0.1, 0.4]
+  max_path_length: 50
+
+# Output Settings
+output_directory: "data/"
+save_format: "npz"
+include_metadata: true
