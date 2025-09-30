@@ -14,6 +14,9 @@ max_generation_attempts: 100
 # Memory/History Settings (Solution 1)
 history_length: 3  # Number of previous actions to remember
 
+# Perception Settings
+perception_size: 3  # Perception window size (3 for 3×3, 5 for 5×5)
+
 # Dataset Sizes
 small_dataset:
   num_environments: 100

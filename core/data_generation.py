@@ -31,6 +31,7 @@ class TrainingConfig:
     max_path_length: int = 50
     max_generation_attempts: int = 100
     history_length: int = 3  # Number of previous actions to remember (Solution 1)
+    perception_size: int = 3  # Perception window size (3 for 3×3, 5 for 5×5)
 
 
 class AStarPathfinder:
@@ -166,24 +167,45 @@ class EnvironmentGenerator:
 
 class PerceptionExtractor:
     """
-    Extract robot's 3x3 perception from environment + action history
+    Extract robot's perception from environment + action history
     
-    Biological Inspiration: Like how visual cortex processes limited peripheral 
-    vision combined with hippocampus memory of recent movements
+    Biological Inspiration: Like how visual cortex processes peripheral 
+    vision combined with hippocampus memory of recent movements.
+    Supports both 3×3 and 5×5 perception windows.
     """
     
-    def __init__(self, history_length: int = 3):
+    def __init__(self, history_length: int = 3, perception_size: int = 3):
         """
         Initialize perception extractor with history tracking
         
         Args:
             history_length: Number of previous actions to remember
+            perception_size: Size of perception window (3 for 3×3, 5 for 5×5)
         """
         self.history_length = history_length
+        self.perception_size = perception_size
+    
+    def extract_perception_view(self, env: np.ndarray, robot_pos: Tuple[int, int]) -> np.ndarray:
+        """Extract perception view around robot position (3×3 or 5×5)"""
+        x, y = robot_pos
+        size = self.perception_size
+        view = np.zeros((size, size))
+        
+        for i in range(size):
+            for j in range(size):
+                env_x = x + i - (size // 2)  # Center around robot
+                env_y = y + j - (size // 2)
+                
+                if 0 <= env_x < env.shape[0] and 0 <= env_y < env.shape[1]:
+                    view[i, j] = env[env_x, env_y]
+                else:
+                    view[i, j] = 1  # Treat out-of-bounds as obstacles
+        
+        return view
     
     @staticmethod
     def extract_3x3_view(env: np.ndarray, robot_pos: Tuple[int, int]) -> np.ndarray:
-        """Extract 3x3 view around robot position"""
+        """Legacy method for 3x3 view (backward compatibility)"""
         x, y = robot_pos
         view = np.zeros((3, 3))
         
@@ -204,7 +226,7 @@ class PerceptionExtractor:
                                     robot_pos: Tuple[int, int],
                                     action_history: List[int]) -> np.ndarray:
         """
-        Extract enhanced perception with action history (Solution 1)
+        Extract enhanced perception with action history
         
         Args:
             env: 10×10 environment grid
@@ -212,15 +234,15 @@ class PerceptionExtractor:
             action_history: List of previous actions
             
         Returns:
-            Enhanced feature vector (21 features):
-            - 9 features: 3×3 perception
-            - 12 features: 3 actions × 4 one-hot = 12 features
+            Enhanced feature vector:
+            - Perception features: (perception_size × perception_size)
+            - History features: (history_length × 4 one-hot)
         """
-        # Extract 3×3 perception (9 features)
-        perception_3x3 = self.extract_3x3_view(env, robot_pos)
-        perception_features = perception_3x3.flatten()  # Shape: (9,)
+        # Extract perception (3×3 or 5×5)
+        perception_view = self.extract_perception_view(env, robot_pos)
+        perception_features = perception_view.flatten()
         
-        # Encode action history as one-hot (12 features)
+        # Encode action history as one-hot
         history_features = []
         recent_actions = action_history[-self.history_length:] if action_history else []
         
@@ -239,6 +261,12 @@ class PerceptionExtractor:
         # Combine perception and history features
         enhanced_features = np.concatenate([perception_features, history_features])
         return enhanced_features.astype(np.float32)
+    
+    def get_feature_count(self) -> int:
+        """Get total number of features for current configuration"""
+        perception_features = self.perception_size * self.perception_size
+        history_features = self.history_length * 4
+        return perception_features + history_features
     
     @staticmethod
     def movement_to_action(current_pos: Tuple[int, int], next_pos: Tuple[int, int]) -> int:
@@ -264,7 +292,10 @@ class TrainingDataGenerator:
     def __init__(self, config: TrainingConfig):
         self.config = config
         self.env_generator = EnvironmentGenerator(config)
-        self.perception_extractor = PerceptionExtractor(history_length=config.history_length)
+        self.perception_extractor = PerceptionExtractor(
+            history_length=config.history_length,
+            perception_size=config.perception_size
+        )
         
     def generate_complete_dataset(self, use_enhanced: bool = True) -> Tuple[np.ndarray, np.ndarray, List[Dict]]:
         """
