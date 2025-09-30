@@ -10,7 +10,9 @@
 
 # Model Architecture
 model:
-  input_size: 9              # 3×3 perception grid (flattened)
+  input_size: 21             # 3×3 perception (9) + action history (12) = 21 features
+  perception_size: 9         # 3×3 perception grid (flattened)
+  history_size: 12           # 3 actions × 4 one-hot encoding = 12 features
   hidden1_size: 64           # First hidden layer neurons
   hidden2_size: 32           # Second hidden layer neurons  
   output_size: 4             # 4 navigation actions (UP, DOWN, LEFT, RIGHT)

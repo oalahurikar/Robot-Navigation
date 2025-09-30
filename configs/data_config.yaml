@@ -11,6 +11,9 @@ max_path_length: 50
 num_environments: 1000
 max_generation_attempts: 100
 
+# Memory/History Settings (Solution 1)
+history_length: 3  # Number of previous actions to remember
+
 # Dataset Sizes
 small_dataset:
   num_environments: 100

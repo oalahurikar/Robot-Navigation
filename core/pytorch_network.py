@@ -58,13 +58,18 @@ class RobotNavigationNet(nn.Module):
     """
     PyTorch Neural Network for Robot Navigation
     
-    Architecture:
-    Input(9) → Hidden1(64) → Hidden2(32) → Output(4)
-    ReLU + Dropout(0.2) + Softmax
+    Architecture (Enhanced with Memory):
+    Input(21) → Hidden1(64) → Hidden2(32) → Output(4)
+    - Input: 9 (perception) + 12 (action history) = 21 features
+    - ReLU + Dropout(0.2) + Softmax
+    
+    Also supports basic mode with Input(9) for backward compatibility
     """
     
     def __init__(self, 
-                 input_size: int = 9,
+                 input_size: int = 21,           # Enhanced: 21 features (9 perception + 12 history)
+                 perception_size: int = 9,       # 3×3 perception grid
+                 history_size: int = 12,         # 3 actions × 4 one-hot encoding
                  hidden1_size: int = 64,
                  hidden2_size: int = 32,
                  output_size: int = 4,
@@ -73,7 +78,9 @@ class RobotNavigationNet(nn.Module):
         Initialize PyTorch neural network
         
         Args:
-            input_size: 3×3 perception grid (9 neurons)
+            input_size: Total input size (21 for enhanced, 9 for basic)
+            perception_size: Size of perception features (9)
+            history_size: Size of history features (12)
             hidden1_size: First hidden layer (64 neurons)
             hidden2_size: Second hidden layer (32 neurons) 
             output_size: 4 navigation actions
@@ -82,6 +89,8 @@ class RobotNavigationNet(nn.Module):
         super(RobotNavigationNet, self).__init__()
         
         self.input_size = input_size
+        self.perception_size = perception_size
+        self.history_size = history_size
         self.hidden1_size = hidden1_size
         self.hidden2_size = hidden2_size
         self.output_size = output_size
@@ -146,8 +155,18 @@ class RobotNavigationNet(nn.Module):
         total_params = sum(p.numel() for p in self.parameters())
         trainable_params = sum(p.numel() for p in self.parameters() if p.requires_grad)
         
+        # Determine mode based on input size
+        mode = "Enhanced" if self.input_size == 21 else "Basic" if self.input_size == 9 else "Custom"
+        feature_breakdown = ""
+        if self.input_size == 21:
+            feature_breakdown = f" ({self.perception_size} perception + {self.history_size} history)"
+        elif self.input_size == 9:
+            feature_breakdown = " (perception only)"
+        
         return {
             'architecture': f"{self.input_size} → {self.hidden1_size} → {self.hidden2_size} → {self.output_size}",
+            'mode': mode,
+            'feature_breakdown': feature_breakdown,
             'total_parameters': total_params,
             'trainable_parameters': trainable_params,
             'dropout_rate': self.dropout_rate
