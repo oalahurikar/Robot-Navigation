@@ -30,6 +30,8 @@ class TrainingConfig:
     min_path_length: int = 5
     max_path_length: int = 50
     max_generation_attempts: int = 100
+    history_length: int = 3  # Number of previous actions to remember (Solution 1)
+    perception_size: int = 3  # Perception window size (3 for 3×3, 5 for 5×5)
 
 
 class AStarPathfinder:
@@ -165,15 +167,45 @@ class EnvironmentGenerator:
 
 class PerceptionExtractor:
     """
-    Extract robot's 3x3 perception from environment
+    Extract robot's perception from environment + action history
     
-    Biological Inspiration: Like how visual cortex processes
-    limited peripheral vision information
+    Biological Inspiration: Like how visual cortex processes peripheral 
+    vision combined with hippocampus memory of recent movements.
+    Supports both 3×3 and 5×5 perception windows.
     """
+    
+    def __init__(self, history_length: int = 3, perception_size: int = 3):
+        """
+        Initialize perception extractor with history tracking
+        
+        Args:
+            history_length: Number of previous actions to remember
+            perception_size: Size of perception window (3 for 3×3, 5 for 5×5)
+        """
+        self.history_length = history_length
+        self.perception_size = perception_size
+    
+    def extract_perception_view(self, env: np.ndarray, robot_pos: Tuple[int, int]) -> np.ndarray:
+        """Extract perception view around robot position (3×3 or 5×5)"""
+        x, y = robot_pos
+        size = self.perception_size
+        view = np.zeros((size, size))
+        
+        for i in range(size):
+            for j in range(size):
+                env_x = x + i - (size // 2)  # Center around robot
+                env_y = y + j - (size // 2)
+                
+                if 0 <= env_x < env.shape[0] and 0 <= env_y < env.shape[1]:
+                    view[i, j] = env[env_x, env_y]
+                else:
+                    view[i, j] = 1  # Treat out-of-bounds as obstacles
+        
+        return view
     
     @staticmethod
     def extract_3x3_view(env: np.ndarray, robot_pos: Tuple[int, int]) -> np.ndarray:
-        """Extract 3x3 view around robot position"""
+        """Legacy method for 3x3 view (backward compatibility)"""
         x, y = robot_pos
         view = np.zeros((3, 3))
         
@@ -188,6 +220,53 @@ class PerceptionExtractor:
                     view[i, j] = 1  # Treat out-of-bounds as obstacles
         
         return view
+    
+    def extract_enhanced_perception(self, 
+                                    env: np.ndarray, 
+                                    robot_pos: Tuple[int, int],
+                                    action_history: List[int]) -> np.ndarray:
+        """
+        Extract enhanced perception with action history
+        
+        Args:
+            env: 10×10 environment grid
+            robot_pos: Current robot position
+            action_history: List of previous actions
+            
+        Returns:
+            Enhanced feature vector:
+            - Perception features: (perception_size × perception_size)
+            - History features: (history_length × 4 one-hot)
+        """
+        # Extract perception (3×3 or 5×5)
+        perception_view = self.extract_perception_view(env, robot_pos)
+        perception_features = perception_view.flatten()
+        
+        # Encode action history as one-hot
+        history_features = []
+        recent_actions = action_history[-self.history_length:] if action_history else []
+        
+        # Pad with zeros if history is shorter than history_length
+        while len(recent_actions) < self.history_length:
+            recent_actions.insert(0, -1)  # Use -1 for "no action yet"
+        
+        # Convert each action to one-hot encoding
+        for action in recent_actions:
+            one_hot = [0, 0, 0, 0]
+            if 0 <= action <= 3:  # Valid action
+                one_hot[action] = 1
+            # If action is -1 (no action yet), leave as [0, 0, 0, 0]
+            history_features.extend(one_hot)
+        
+        # Combine perception and history features
+        enhanced_features = np.concatenate([perception_features, history_features])
+        return enhanced_features.astype(np.float32)
+    
+    def get_feature_count(self) -> int:
+        """Get total number of features for current configuration"""
+        perception_features = self.perception_size * self.perception_size
+        history_features = self.history_length * 4
+        return perception_features + history_features
     
     @staticmethod
     def movement_to_action(current_pos: Tuple[int, int], next_pos: Tuple[int, int]) -> int:
@@ -213,14 +292,21 @@ class TrainingDataGenerator:
     def __init__(self, config: TrainingConfig):
         self.config = config
         self.env_generator = EnvironmentGenerator(config)
-        self.perception_extractor = PerceptionExtractor()
+        self.perception_extractor = PerceptionExtractor(
+            history_length=config.history_length,
+            perception_size=config.perception_size
+        )
         
-    def generate_complete_dataset(self) -> Tuple[np.ndarray, np.ndarray, List[Dict]]:
+    def generate_complete_dataset(self, use_enhanced: bool = True) -> Tuple[np.ndarray, np.ndarray, List[Dict]]:
         """
         Generate complete training dataset for robot navigation
         
+        Args:
+            use_enhanced: If True, use enhanced perception with action history (21 features)
+                         If False, use basic perception only (9 features)
+        
         Returns:
-        X_train: (n_examples, 9) - Robot 3x3 perceptions
+        X_train: (n_examples, 21 or 9) - Robot perceptions with/without history
         y_train: (n_examples,) - Optimal actions from A*
         metadata: List of environment metadata
         """
@@ -229,7 +315,9 @@ class TrainingDataGenerator:
         all_actions = []
         all_metadata = []
         
+        feature_count = 21 if use_enhanced else 9
         print(f"🧠 Generating training data for {self.config.num_environments} environments...")
+        print(f"📊 Feature mode: {'Enhanced (21 features: 9 perception + 12 history)' if use_enhanced else 'Basic (9 features: perception only)'}")
         
         for env_idx in range(self.config.num_environments):
             if (env_idx + 1) % 100 == 0:
@@ -249,20 +337,31 @@ class TrainingDataGenerator:
                 # Step 3: Extract training examples from path
                 env_perceptions = []
                 env_actions = []
+                action_history = []  # Track action history for enhanced mode
                 
                 for i in range(len(a_star_path) - 1):
                     current_pos = a_star_path[i]
                     next_pos = a_star_path[i + 1]
                     
-                    # Extract 3x3 perception around current position
-                    perception_3x3 = self.perception_extractor.extract_3x3_view(env_10x10, current_pos)
-                    flattened_perception = perception_3x3.flatten()
-                    
                     # Convert movement to action
                     action = self.perception_extractor.movement_to_action(current_pos, next_pos)
                     
-                    env_perceptions.append(flattened_perception)
+                    if use_enhanced:
+                        # Extract enhanced perception with action history
+                        enhanced_perception = self.perception_extractor.extract_enhanced_perception(
+                            env_10x10, current_pos, action_history
+                        )
+                        env_perceptions.append(enhanced_perception)
+                    else:
+                        # Extract basic 3x3 perception only
+                        perception_3x3 = self.perception_extractor.extract_3x3_view(env_10x10, current_pos)
+                        flattened_perception = perception_3x3.flatten()
+                        env_perceptions.append(flattened_perception)
+                    
                     env_actions.append(action)
+                    
+                    # Update action history for next iteration
+                    action_history.append(action)
                 
                 # Add to complete dataset
                 all_perceptions.extend(env_perceptions)
@@ -307,6 +406,15 @@ class TrainingDataGenerator:
         print(f"Output shape: {y_train.shape}")
         print(f"Input data type: {X_train.dtype}")
         print(f"Output data type: {y_train.dtype}")
+        
+        # Feature breakdown
+        feature_size = X_train.shape[1] if len(X_train.shape) > 1 else 1
+        if feature_size == 21:
+            print(f"Feature mode: Enhanced (9 perception + 12 history = 21 features)")
+        elif feature_size == 9:
+            print(f"Feature mode: Basic (9 perception features)")
+        else:
+            print(f"Feature mode: Unknown ({feature_size} features)")
         
         # Memory usage
         input_memory_mb = X_train.nbytes / 1024 / 1024

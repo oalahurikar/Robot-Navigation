@@ -101,19 +101,20 @@ DATA_PATH = project_root / "data" / "raw" / "small_training_dataset.npz"
 # MAIN TRAINING FUNCTION
 # =============================================================================
 
-def main(config_path: str = None):
+def main(config_path: str = None, perception_mode: str = "3x3"):
     """
     Main training pipeline
     
     Args:
         config_path: Path to configuration file
+        perception_mode: "3x3" or "5x5" perception mode
     """
     print("🤖 ROBOT NAVIGATION NEURAL NETWORK TRAINING")
     print("=" * 60)
     
     # 1. Load configuration
     print("📋 Loading configuration...")
-    config = load_config(config_path)
+    config = load_config(config_path, perception_mode)
     
     # Extract configuration sections
     model_config = config['model']
@@ -379,6 +380,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Train Robot Navigation Neural Network')
     parser.add_argument('--config', type=str, default=None,
                        help='Path to configuration file (default: configs/nn_config.yaml)')
+    parser.add_argument('--perception', choices=['3x3', '5x5'], default='3x3',
+                       help='Perception window size (auto-selects config)')
     parser.add_argument('--hyperparameter-tuning', action='store_true',
                        help='Run hyperparameter tuning experiments')
     parser.add_argument('--architecture-comparison', action='store_true',
@@ -386,9 +389,14 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
+    # Use unified config with perception mode
+    if args.config is None:
+        args.config = 'configs/nn_config.yaml'
+        print(f"🎯 Using unified config with {args.perception} perception mode: {args.config}")
+    
     try:
-        # Main training
-        model, history = main(args.config)
+        # Main training with perception mode
+        model, history = main(args.config, perception_mode=args.perception)
         
         # Optional: Run additional experiments
         if args.hyperparameter_tuning or args.architecture_comparison:

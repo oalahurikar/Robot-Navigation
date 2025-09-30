@@ -24,20 +24,23 @@ sys.path.insert(0, str(project_root))
 from core.data_generation import TrainingDataGenerator, TrainingConfig, save_training_data
 
 
-def generate_small_dataset():
+def generate_small_dataset(use_enhanced=True, perception_size=3):
     """Generate a small dataset for quick testing"""
-    print("🧠 Generating small training dataset...")
+    perception_desc = "3×3" if perception_size == 3 else "5×5"
+    print(f"🧠 Generating small training dataset with {perception_desc} perception...")
     
     config = TrainingConfig(
         grid_size=10,
         num_environments=100,  # Small dataset for quick generation
         obstacle_density_range=(0.1, 0.3),
         min_path_length=5,
-        max_path_length=25
+        max_path_length=25,
+        history_length=3,  # Solution 1: Memory/History
+        perception_size=perception_size  # 3×3 or 5×5 perception
     )
     
     generator = TrainingDataGenerator(config)
-    X_train, y_train, metadata = generator.generate_complete_dataset()
+    X_train, y_train, metadata = generator.generate_complete_dataset(use_enhanced=use_enhanced)
     
     # Save the data
     save_training_data(X_train, y_train, metadata, "data/raw/small_training_dataset.npz")
@@ -63,20 +66,23 @@ def generate_small_dataset():
     return X_train, y_train, metadata
 
 
-def generate_medium_dataset():
+def generate_medium_dataset(use_enhanced=True, perception_size=3):
     """Generate a medium-sized dataset for training"""
-    print("🧠 Generating medium training dataset...")
+    perception_desc = "3×3" if perception_size == 3 else "5×5"
+    print(f"🧠 Generating medium training dataset with {perception_desc} perception...")
     
     config = TrainingConfig(
         grid_size=10,
         num_environments=500,  # Medium dataset
         obstacle_density_range=(0.1, 0.35),
         min_path_length=5,
-        max_path_length=30
+        max_path_length=30,
+        history_length=3,  # Solution 1: Memory/History
+        perception_size=perception_size  # 3×3 or 5×5 perception
     )
     
     generator = TrainingDataGenerator(config)
-    X_train, y_train, metadata = generator.generate_complete_dataset()
+    X_train, y_train, metadata = generator.generate_complete_dataset(use_enhanced=use_enhanced)
     
     # Save the data
     save_training_data(X_train, y_train, metadata, "data/raw/medium_training_dataset.npz")
@@ -91,20 +97,23 @@ def generate_medium_dataset():
     return X_train, y_train, metadata
 
 
-def generate_large_dataset():
+def generate_large_dataset(use_enhanced=True, perception_size=3):
     """Generate a large dataset for full training"""
-    print("🧠 Generating large training dataset...")
+    perception_desc = "3×3" if perception_size == 3 else "5×5"
+    print(f"🧠 Generating large training dataset with {perception_desc} perception...")
     
     config = TrainingConfig(
         grid_size=10,
         num_environments=1000,  # Large dataset
         obstacle_density_range=(0.1, 0.4),
         min_path_length=5,
-        max_path_length=50
+        max_path_length=50,
+        history_length=3,  # Solution 1: Memory/History
+        perception_size=perception_size  # 3×3 or 5×5 perception
     )
     
     generator = TrainingDataGenerator(config)
-    X_train, y_train, metadata = generator.generate_complete_dataset()
+    X_train, y_train, metadata = generator.generate_complete_dataset(use_enhanced=use_enhanced)
     
     # Save the data
     save_training_data(X_train, y_train, metadata, "data/raw/large_training_dataset.npz")
@@ -125,17 +134,63 @@ def show_sample_data(X_train, y_train):
     print("=" * 50)
     
     action_names = ['UP', 'DOWN', 'LEFT', 'RIGHT']
+    feature_size = X_train.shape[1] if len(X_train.shape) > 1 else 1
     
     # Show first 5 examples
     for i in range(min(5, len(X_train))):
-        perception = X_train[i].reshape(3, 3)
         action = y_train[i]
         
         print(f"\nExample {i+1}:")
-        print(f"  3x3 Perception (flattened: {X_train[i]}):")
-        for row in perception:
-            print(f"    {' '.join(['X' if x > 0 else '.' for x in row])}")
-        print(f"  Action: {action} ({action_names[action]})")
+        
+        if feature_size == 37:
+            # Enhanced 5×5 mode: 25 perception + 12 history
+            perception = X_train[i][:25].reshape(5, 5)
+            history = X_train[i][25:37].reshape(3, 4)  # 3 actions × 4 one-hot
+            
+            print(f"  5×5 Perception:")
+            for row in perception:
+                print(f"    {' '.join(['X' if x > 0 else '.' for x in row])}")
+            
+            print(f"  Action History (last 3 actions):")
+            for j, action_vec in enumerate(history):
+                action_idx = np.argmax(action_vec) if np.sum(action_vec) > 0 else -1
+                if action_idx >= 0:
+                    print(f"    {j+1}. {action_names[action_idx]}")
+                else:
+                    print(f"    {j+1}. (no action)")
+        elif feature_size == 25:
+            # Basic 5×5 mode: 25 perception only
+            perception = X_train[i].reshape(5, 5)
+            print(f"  5×5 Perception:")
+            for row in perception:
+                print(f"    {' '.join(['X' if x > 0 else '.' for x in row])}")
+        elif feature_size == 21:
+            # Enhanced 3×3 mode: 9 perception + 12 history
+            perception = X_train[i][:9].reshape(3, 3)
+            history = X_train[i][9:21].reshape(3, 4)  # 3 actions × 4 one-hot
+            
+            print(f"  3×3 Perception:")
+            for row in perception:
+                print(f"    {' '.join(['X' if x > 0 else '.' for x in row])}")
+            
+            print(f"  Action History (last 3 actions):")
+            for j, action_vec in enumerate(history):
+                action_idx = np.argmax(action_vec) if np.sum(action_vec) > 0 else -1
+                if action_idx >= 0:
+                    print(f"    {j+1}. {action_names[action_idx]}")
+                else:
+                    print(f"    {j+1}. (no action)")
+        elif feature_size == 9:
+            # Basic 3×3 mode: 9 perception only
+            perception = X_train[i].reshape(3, 3)
+            print(f"  3×3 Perception:")
+            for row in perception:
+                print(f"    {' '.join(['X' if x > 0 else '.' for x in row])}")
+        else:
+            print(f"  Unknown feature format: {feature_size} features")
+            continue
+        
+        print(f"  → Action: {action} ({action_names[action]})")
 
 
 def main():
@@ -145,18 +200,35 @@ def main():
                        help='Size of dataset to generate')
     parser.add_argument('--output-dir', type=str, default='.', 
                        help='Directory to save the dataset')
+    parser.add_argument('--basic', action='store_true', 
+                       help='Use basic mode (9 features) instead of enhanced mode')
+    parser.add_argument('--perception', choices=['3x3', '5x5'], default='3x3',
+                       help='Perception window size (3x3 or 5x5)')
     
     args = parser.parse_args()
     
-    print(f"🚀 Generating {args.dataset_size} training dataset...")
+    use_enhanced = not args.basic
+    perception_size = 5 if args.perception == '5x5' else 3
+    
+    # Calculate feature count
+    perception_features = perception_size * perception_size
+    history_features = 12 if use_enhanced else 0
+    total_features = perception_features + history_features
+    
+    if args.basic:
+        mode_str = f"basic ({perception_features} features)"
+    else:
+        mode_str = f"enhanced ({total_features} features: {perception_features} perception + {history_features} history)"
+    
+    print(f"🚀 Generating {args.dataset_size} training dataset ({mode_str})...")
     print("=" * 60)
     
     if args.dataset_size == "small":
-        X_train, y_train, metadata = generate_small_dataset()
+        X_train, y_train, metadata = generate_small_dataset(use_enhanced=use_enhanced, perception_size=perception_size)
     elif args.dataset_size == "medium":
-        X_train, y_train, metadata = generate_medium_dataset()
+        X_train, y_train, metadata = generate_medium_dataset(use_enhanced=use_enhanced, perception_size=perception_size)
     elif args.dataset_size == "large":
-        X_train, y_train, metadata = generate_large_dataset()
+        X_train, y_train, metadata = generate_large_dataset(use_enhanced=use_enhanced, perception_size=perception_size)
     else:
         print(f"❌ Unknown dataset size: {args.dataset_size}")
         print("Available options: small, medium, large")

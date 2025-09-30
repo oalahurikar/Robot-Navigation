@@ -58,13 +58,19 @@ class RobotNavigationNet(nn.Module):
     """
     PyTorch Neural Network for Robot Navigation
     
-    Architecture:
-    Input(9) → Hidden1(64) → Hidden2(32) → Output(4)
-    ReLU + Dropout(0.2) + Softmax
+    Architecture (Enhanced with Memory):
+    Input(Variable) → Hidden1(64) → Hidden2(32) → Output(4)
+    - Input: perception_features + history_features
+    - Supports 3×3 (9 features) or 5×5 (25 features) perception
+    - ReLU + Dropout(0.2) + Softmax
+    
+    Also supports basic mode with Input(9) for backward compatibility
     """
     
     def __init__(self, 
-                 input_size: int = 9,
+                 input_size: int = 37,           # Default: 25 (5×5 perception) + 12 (history)
+                 perception_size: int = 25,      # 5×5 perception grid (or 9 for 3×3)
+                 history_size: int = 12,         # 3 actions × 4 one-hot encoding
                  hidden1_size: int = 64,
                  hidden2_size: int = 32,
                  output_size: int = 4,
@@ -73,7 +79,9 @@ class RobotNavigationNet(nn.Module):
         Initialize PyTorch neural network
         
         Args:
-            input_size: 3×3 perception grid (9 neurons)
+            input_size: Total input size (21 for enhanced, 9 for basic)
+            perception_size: Size of perception features (9)
+            history_size: Size of history features (12)
             hidden1_size: First hidden layer (64 neurons)
             hidden2_size: Second hidden layer (32 neurons) 
             output_size: 4 navigation actions
@@ -82,6 +90,8 @@ class RobotNavigationNet(nn.Module):
         super(RobotNavigationNet, self).__init__()
         
         self.input_size = input_size
+        self.perception_size = perception_size
+        self.history_size = history_size
         self.hidden1_size = hidden1_size
         self.hidden2_size = hidden2_size
         self.output_size = output_size
@@ -146,8 +156,26 @@ class RobotNavigationNet(nn.Module):
         total_params = sum(p.numel() for p in self.parameters())
         trainable_params = sum(p.numel() for p in self.parameters() if p.requires_grad)
         
+        # Determine mode based on input size and perception size
+        if self.perception_size == 25:
+            mode = "Enhanced 5×5"
+        elif self.perception_size == 9:
+            mode = "Enhanced 3×3"
+        elif self.input_size == 9:
+            mode = "Basic 3×3"
+        else:
+            mode = "Custom"
+        
+        feature_breakdown = f" ({self.perception_size} perception + {self.history_size} history)"
+        if self.perception_size == 25:
+            feature_breakdown = " (25 perception + 12 history)"
+        elif self.perception_size == 9:
+            feature_breakdown = " (9 perception + 12 history)"
+        
         return {
             'architecture': f"{self.input_size} → {self.hidden1_size} → {self.hidden2_size} → {self.output_size}",
+            'mode': mode,
+            'feature_breakdown': feature_breakdown,
             'total_parameters': total_params,
             'trainable_parameters': trainable_params,
             'dropout_rate': self.dropout_rate
@@ -392,15 +420,16 @@ class RobotNavigationTrainer:
 # CONFIGURATION LOADING
 # =============================================================================
 
-def load_config(config_path: str = None) -> dict:
+def load_config(config_path: str = None, perception_mode: str = "3x3") -> dict:
     """
-    Load configuration from YAML file
+    Load configuration from YAML file and update for perception mode
     
     Args:
         config_path: Path to configuration file
+        perception_mode: "3x3" or "5x5" perception mode
         
     Returns:
-        Configuration dictionary
+        Configuration dictionary with updated parameters
     """
     if config_path is None:
         config_path = Path(__file__).parent.parent / "configs" / "nn_config.yaml"
@@ -409,7 +438,11 @@ def load_config(config_path: str = None) -> dict:
         with open(config_path, 'r') as f:
             config = yaml.safe_load(f)
         print(f"✅ Configuration loaded from {config_path}")
+        
+        # Update config for perception mode
+        config = update_config_for_perception_mode(config, perception_mode)
         return config
+        
     except FileNotFoundError:
         print(f"❌ Configuration file not found: {config_path}")
         print("💡 Using default configuration...")
@@ -418,6 +451,35 @@ def load_config(config_path: str = None) -> dict:
         print(f"❌ Error parsing YAML configuration: {e}")
         print("💡 Using default configuration...")
         return get_default_config()
+
+
+def update_config_for_perception_mode(config: dict, perception_mode: str) -> dict:
+    """
+    Update configuration for specific perception mode
+    
+    Args:
+        config: Configuration dictionary
+        perception_mode: "3x3" or "5x5"
+        
+    Returns:
+        Updated configuration dictionary
+    """
+    if perception_mode == "5x5":
+        # 5×5 Enhanced Mode
+        config['model']['perception_size'] = 25
+        config['model']['input_size'] = 37  # 25 perception + 12 history
+        print("🎯 Updated config for 5×5 Enhanced Mode (37 features)")
+    elif perception_mode == "3x3":
+        # 3×3 Enhanced Mode (default)
+        config['model']['perception_size'] = 9
+        config['model']['input_size'] = 21  # 9 perception + 12 history
+        print("🎯 Updated config for 3×3 Enhanced Mode (21 features)")
+    else:
+        print(f"⚠️  Unknown perception mode: {perception_mode}, using 3×3")
+        config['model']['perception_size'] = 9
+        config['model']['input_size'] = 21
+    
+    return config
 
 def get_default_config() -> dict:
     """Get default configuration if YAML file is not available"""
