@@ -20,7 +20,7 @@ model:
   output_activation: "softmax"  # Softmax for output layer
   
   # Regularization
-  dropout_rate: 0.2          # Dropout rate for regularization
+  dropout_rate: 0.1          # Dropout rate for regularization
   weight_decay: 0.0          # L2 regularization (not used in this implementation)
 
 # =============================================================================
@@ -29,16 +29,16 @@ model:
 
 training:
   # Optimization
-  learning_rate: 0.001       # Initial learning rate
+  learning_rate: 0.0005       # Initial learning rate
   batch_size: 32             # Mini-batch size
   epochs: 100                # Maximum number of epochs
   
   # Early stopping
   early_stopping:
     enabled: true
-    patience: 15             # Epochs to wait before stopping
+    patience: 55             # Epochs to wait before stopping
     monitor: "val_loss"      # Metric to monitor
-    min_delta: 0.001         # Minimum change to qualify as improvement
+    min_delta: 0.0001         # Minimum change to qualify as improvement
   
   # Learning rate scheduling (future enhancement)
   lr_scheduler:
