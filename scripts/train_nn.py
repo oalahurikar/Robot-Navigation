@@ -37,7 +37,11 @@ from core.data_generation import load_training_data
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 def load_config(config_path: str = None) -> dict:
+=======
+def get_dataset_filename(use_goal_delta: bool = True) -> str:
+>>>>>>> Stashed changes
 =======
 def get_dataset_filename(use_goal_delta: bool = True) -> str:
 >>>>>>> Stashed changes
@@ -50,9 +54,12 @@ def get_dataset_filename(use_goal_delta: bool = True) -> str:
     Args:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         config_path: Path to configuration file
         
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
         use_goal_delta: True for goal-aware mode, False for basic mode
@@ -63,10 +70,13 @@ def get_dataset_filename(use_goal_delta: bool = True) -> str:
     """
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     if config_path is None:
         config_path = project_root / "configs" / "nn_config.yaml"
     
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
     if use_goal_delta:
@@ -129,6 +139,9 @@ def load_data(use_goal_delta: bool = True, verbose: bool = True):
     
     return X, y, metadata, is_goal_aware
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -174,8 +187,11 @@ DATA_PATH = project_root / "data" / "raw" / "small_training_dataset.npz"
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 def main(config_path: str = None, perception_mode: str = "3x3"):
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 def train_model(use_goal_delta: bool = True,
@@ -186,6 +202,7 @@ def train_model(use_goal_delta: bool = True,
     Main training pipeline
     
     Args:
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
         config_path: Path to configuration file
@@ -218,6 +235,8 @@ def train_model(use_goal_delta: bool = True,
 =======
 =======
 >>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
         use_goal_delta: True for goal-aware mode, False for basic mode
         config_path: Path to config file (None = default)
         verbose: Print training progress
@@ -237,6 +256,9 @@ def train_model(use_goal_delta: bool = True,
     # 2. Load data
     X, y, metadata, is_goal_aware = load_data(use_goal_delta, verbose)
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -487,6 +509,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Train Robot Navigation Neural Network')
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+    parser.add_argument('--basic', action='store_true',
+                       help='Use basic mode (9 features) instead of goal-aware mode (11 features)')
+>>>>>>> Stashed changes
 =======
     parser.add_argument('--basic', action='store_true',
                        help='Use basic mode (9 features) instead of goal-aware mode (11 features)')
@@ -532,9 +559,14 @@ if __name__ == "__main__":
         
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         if args.hyperparameter_tuning:
             print("\n🔧 Running hyperparameter tuning...")
             best_config, best_acc = hyperparameter_tuning_example()
+=======
+        mode_type = "basic" if args.basic else "goal_aware"
+        model_path = model_dir / f"robot_nav_{mode_type}.pth"
+>>>>>>> Stashed changes
 =======
         mode_type = "basic" if args.basic else "goal_aware"
         model_path = model_dir / f"robot_nav_{mode_type}.pth"
