@@ -36,7 +36,11 @@ from core.data_generation import load_training_data
 # =============================================================================
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 def load_config(config_path: str = None) -> dict:
+=======
+def get_dataset_filename(use_goal_delta: bool = True) -> str:
+>>>>>>> Stashed changes
 =======
 def get_dataset_filename(use_goal_delta: bool = True) -> str:
 >>>>>>> Stashed changes
@@ -45,9 +49,12 @@ def get_dataset_filename(use_goal_delta: bool = True) -> str:
     
     Args:
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         config_path: Path to configuration file
         
 =======
+=======
+>>>>>>> Stashed changes
         use_goal_delta: True for goal-aware mode, False for basic mode
     
 >>>>>>> Stashed changes
@@ -55,10 +62,13 @@ def get_dataset_filename(use_goal_delta: bool = True) -> str:
         Configuration dictionary
     """
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     if config_path is None:
         config_path = project_root / "configs" / "nn_config.yaml"
     
 =======
+=======
+>>>>>>> Stashed changes
     if use_goal_delta:
         return "large_training_dataset.npz"  # Goal-aware mode (default)
     else:
@@ -118,6 +128,9 @@ def load_data(use_goal_delta: bool = True, verbose: bool = True):
         print(f"   Environments: {len(metadata)}")
     
     return X, y, metadata, is_goal_aware
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 def get_default_config() -> dict:
@@ -160,8 +173,11 @@ DATA_PATH = project_root / "data" / "raw" / "small_training_dataset.npz"
 # =============================================================================
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 def main(config_path: str = None, perception_mode: str = "3x3"):
 =======
+=======
+>>>>>>> Stashed changes
 def train_model(use_goal_delta: bool = True,
                 config_path: str = None,
                 verbose: bool = True):
@@ -170,6 +186,7 @@ def train_model(use_goal_delta: bool = True,
     Main training pipeline
     
     Args:
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
         config_path: Path to configuration file
         perception_mode: "3x3" or "5x5" perception mode
@@ -199,6 +216,8 @@ def train_model(use_goal_delta: bool = True,
         print("💡 Run 'python scripts/generate_data.py' first to generate training data")
         return
 =======
+=======
+>>>>>>> Stashed changes
         use_goal_delta: True for goal-aware mode, False for basic mode
         config_path: Path to config file (None = default)
         verbose: Print training progress
@@ -217,6 +236,9 @@ def train_model(use_goal_delta: bool = True,
     
     # 2. Load data
     X, y, metadata, is_goal_aware = load_data(use_goal_delta, verbose)
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     
     # 3. Create data loaders
@@ -464,6 +486,11 @@ if __name__ == "__main__":
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='Train Robot Navigation Neural Network')
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+    parser.add_argument('--basic', action='store_true',
+                       help='Use basic mode (9 features) instead of goal-aware mode (11 features)')
+>>>>>>> Stashed changes
 =======
     parser.add_argument('--basic', action='store_true',
                        help='Use basic mode (9 features) instead of goal-aware mode (11 features)')
@@ -504,9 +531,14 @@ if __name__ == "__main__":
             print("=" * 60)
         
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         if args.hyperparameter_tuning:
             print("\n🔧 Running hyperparameter tuning...")
             best_config, best_acc = hyperparameter_tuning_example()
+=======
+        mode_type = "basic" if args.basic else "goal_aware"
+        model_path = model_dir / f"robot_nav_{mode_type}.pth"
+>>>>>>> Stashed changes
 =======
         mode_type = "basic" if args.basic else "goal_aware"
         model_path = model_dir / f"robot_nav_{mode_type}.pth"

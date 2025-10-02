@@ -25,10 +25,17 @@ from core.data_generation import TrainingDataGenerator, TrainingConfig, save_tra
 
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 def generate_small_dataset(use_enhanced=True, perception_size=3):
     """Generate a small dataset for quick testing"""
     perception_desc = "3×3" if perception_size == 3 else "5×5"
     print(f"🧠 Generating small training dataset with {perception_desc} perception...")
+=======
+def generate_small_dataset(use_goal_delta=True):
+    """Generate a small dataset for quick testing"""
+    mode_desc = "goal-aware" if use_goal_delta else "basic"
+    print(f"🧠 Generating small training dataset with {mode_desc} perception...")
+>>>>>>> Stashed changes
 =======
 def generate_small_dataset(use_goal_delta=True):
     """Generate a small dataset for quick testing"""
@@ -44,8 +51,13 @@ def generate_small_dataset(use_goal_delta=True):
         min_path_length=5,
         max_path_length=25,
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         history_length=3,  # Solution 1: Memory/History
         perception_size=perception_size  # 3×3 or 5×5 perception
+=======
+        perception_size=3,  # 3×3 perception
+        use_goal_delta=use_goal_delta
+>>>>>>> Stashed changes
 =======
         perception_size=3,  # 3×3 perception
         use_goal_delta=use_goal_delta
@@ -80,10 +92,17 @@ def generate_small_dataset(use_goal_delta=True):
 
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 def generate_medium_dataset(use_enhanced=True, perception_size=3):
     """Generate a medium-sized dataset for training"""
     perception_desc = "3×3" if perception_size == 3 else "5×5"
     print(f"🧠 Generating medium training dataset with {perception_desc} perception...")
+=======
+def generate_medium_dataset(use_goal_delta=True):
+    """Generate a medium-sized dataset for training"""
+    mode_desc = "goal-aware" if use_goal_delta else "basic"
+    print(f"🧠 Generating medium training dataset with {mode_desc} perception...")
+>>>>>>> Stashed changes
 =======
 def generate_medium_dataset(use_goal_delta=True):
     """Generate a medium-sized dataset for training"""
@@ -99,8 +118,13 @@ def generate_medium_dataset(use_goal_delta=True):
         min_path_length=5,
         max_path_length=30,
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         history_length=3,  # Solution 1: Memory/History
         perception_size=perception_size  # 3×3 or 5×5 perception
+=======
+        perception_size=3,  # 3×3 perception
+        use_goal_delta=use_goal_delta
+>>>>>>> Stashed changes
 =======
         perception_size=3,  # 3×3 perception
         use_goal_delta=use_goal_delta
@@ -124,10 +148,17 @@ def generate_medium_dataset(use_goal_delta=True):
 
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 def generate_large_dataset(use_enhanced=True, perception_size=3):
     """Generate a large dataset for full training"""
     perception_desc = "3×3" if perception_size == 3 else "5×5"
     print(f"🧠 Generating large training dataset with {perception_desc} perception...")
+=======
+def generate_large_dataset(use_goal_delta=True):
+    """Generate a large dataset for full training"""
+    mode_desc = "goal-aware" if use_goal_delta else "basic"
+    print(f"🧠 Generating large training dataset with {mode_desc} perception...")
+>>>>>>> Stashed changes
 =======
 def generate_large_dataset(use_goal_delta=True):
     """Generate a large dataset for full training"""
@@ -143,8 +174,13 @@ def generate_large_dataset(use_goal_delta=True):
         min_path_length=5,
         max_path_length=50,
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         history_length=3,  # Solution 1: Memory/History
         perception_size=perception_size  # 3×3 or 5×5 perception
+=======
+        perception_size=3,  # 3×3 perception
+        use_goal_delta=use_goal_delta
+>>>>>>> Stashed changes
 =======
         perception_size=3,  # 3×3 perception
         use_goal_delta=use_goal_delta
@@ -233,7 +269,11 @@ def show_sample_data(X_train, y_train):
             # Basic 3×3 mode: 9 perception only
             perception = X_train[i].reshape(3, 3)
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             print(f"  3×3 Perception:")
+=======
+            print(f"  3×3 Perception (Binary):")
+>>>>>>> Stashed changes
 =======
             print(f"  3×3 Perception (Binary):")
 >>>>>>> Stashed changes
@@ -253,6 +293,7 @@ def main():
                        help='Size of dataset to generate')
     parser.add_argument('--basic', action='store_true', 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                        help='Use basic mode (9 features) instead of enhanced mode')
     parser.add_argument('--perception', choices=['3x3', '5x5'], default='3x3',
                        help='Perception window size (3x3 or 5x5)')
@@ -268,6 +309,13 @@ def main():
     
     use_goal_delta = not args.basic
 >>>>>>> Stashed changes
+=======
+                       help='Use basic mode (9 features) instead of goal-aware mode (11 features)')
+    
+    args = parser.parse_args()
+    
+    use_goal_delta = not args.basic
+>>>>>>> Stashed changes
     
     # Calculate feature count
     perception_features = 9  # 3×3 perception
@@ -275,10 +323,18 @@ def main():
     total_features = perception_features + goal_features
     
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     if args.basic:
         mode_str = f"basic ({perception_features} features)"
     else:
         mode_str = f"enhanced ({total_features} features: {perception_features} perception + {history_features} history)"
+=======
+    # Build description string
+    if args.basic:
+        mode_str = f"basic ({perception_features} perception features)"
+    else:
+        mode_str = f"goal-aware ({total_features} features: {perception_features} perception + {goal_features} goal_delta)"
+>>>>>>> Stashed changes
 =======
     # Build description string
     if args.basic:
@@ -292,11 +348,19 @@ def main():
     
     if args.dataset_size == "small":
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         X_train, y_train, metadata = generate_small_dataset(use_enhanced=use_enhanced, perception_size=perception_size)
     elif args.dataset_size == "medium":
         X_train, y_train, metadata = generate_medium_dataset(use_enhanced=use_enhanced, perception_size=perception_size)
     elif args.dataset_size == "large":
         X_train, y_train, metadata = generate_large_dataset(use_enhanced=use_enhanced, perception_size=perception_size)
+=======
+        X_train, y_train, metadata = generate_small_dataset(use_goal_delta=use_goal_delta)
+    elif args.dataset_size == "medium":
+        X_train, y_train, metadata = generate_medium_dataset(use_goal_delta=use_goal_delta)
+    elif args.dataset_size == "large":
+        X_train, y_train, metadata = generate_large_dataset(use_goal_delta=use_goal_delta)
+>>>>>>> Stashed changes
 =======
         X_train, y_train, metadata = generate_small_dataset(use_goal_delta=use_goal_delta)
     elif args.dataset_size == "medium":
