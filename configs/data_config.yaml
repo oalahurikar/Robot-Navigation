@@ -15,7 +15,12 @@ max_generation_attempts: 100
 history_length: 3  # Number of previous actions to remember
 
 # Perception Settings
-perception_size: 3  # Perception window size (3 for 3×3, 5 for 5×5)
+perception_size: 5  # Perception window size (3 for 3×3, 5 for 5×5)
+
+# Distance-Based Perception Settings (Solution 3)
+# Enable distance-based perception for improved generalization and real-world transfer
+use_distance_field: true  # true=distance-based, false=binary (legacy)
+max_sensing_distance: 5   # Maximum distance for normalization (matches perception_size)
 
 # Dataset Sizes
 small_dataset:

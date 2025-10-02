@@ -3,14 +3,13 @@
 ===============================================================
 
 Biological Inspiration: Like how animals learn navigation by observing expert 
-demonstrations and memorizing state-action patterns through hippocampus place 
-cells and motor cortex learning.
+demonstrations and using goal-relative spatial awareness (like a compass).
 
 Mathematical Foundation: Supervised learning with expert demonstrations, where 
 A* algorithm provides optimal training labels for each robot perception state.
 
 Learning Objective: Generate training data where robot learns to navigate with 
-limited 3x3 perception by imitating optimal A* pathfinding decisions.
+limited 3x3 perception + goal direction by imitating optimal A* pathfinding decisions.
 """
 
 import numpy as np
@@ -24,14 +23,15 @@ from dataclasses import dataclass
 @dataclass
 class TrainingConfig:
     """Configuration for training data generation"""
-    grid_size: int = 10
+    grid_size: int = 10  # Inner navigable area (10x10)
+    wall_padding: int = 1  # Wall border around navigable area
     num_environments: int = 1000
     obstacle_density_range: Tuple[float, float] = (0.1, 0.4)
     min_path_length: int = 5
     max_path_length: int = 50
     max_generation_attempts: int = 100
-    history_length: int = 3  # Number of previous actions to remember (Solution 1)
-    perception_size: int = 3  # Perception window size (3 for 3×3, 5 for 5×5)
+    perception_size: int = 3  # Perception window size (3x3 only for original solution)
+    use_goal_delta: bool = True  # Include goal relative coordinates (dx, dy)
 
 
 class AStarPathfinder:
@@ -109,23 +109,37 @@ class EnvironmentGenerator:
         self.config = config
     
     def generate_environment(self) -> Tuple[np.ndarray, Tuple[int, int], Tuple[int, int]]:
-        """Generate a single environment with obstacles"""
+        """Generate a single environment with obstacles and wall padding"""
         for attempt in range(self.config.max_generation_attempts):
-            # Create empty grid
-            env = np.zeros((self.config.grid_size, self.config.grid_size), dtype=int)
+            # Create grid with wall padding: (grid_size + 2*padding) x (grid_size + 2*padding)
+            total_size = self.config.grid_size + 2 * self.config.wall_padding
+            env = np.zeros((total_size, total_size), dtype=int)
             
-            # Place obstacles randomly
+            # Add wall borders
+            env[0, :] = 1  # Top wall
+            env[-1, :] = 1  # Bottom wall
+            env[:, 0] = 1  # Left wall
+            env[:, -1] = 1  # Right wall
+            
+            # Calculate inner navigable area (excluding walls)
+            inner_start = self.config.wall_padding
+            inner_end = self.config.grid_size + self.config.wall_padding
+            
+            # Place obstacles randomly in inner area only
             obstacle_density = random.uniform(*self.config.obstacle_density_range)
-            num_obstacles = int(obstacle_density * env.size)
+            inner_area_size = self.config.grid_size * self.config.grid_size
+            num_obstacles = int(obstacle_density * inner_area_size)
             
-            # Place obstacles
-            positions = [(i, j) for i in range(env.shape[0]) for j in range(env.shape[1])]
-            random.shuffle(positions)
+            # Get inner area positions
+            inner_positions = [(i, j) for i in range(inner_start, inner_end) 
+                             for j in range(inner_start, inner_end)]
+            random.shuffle(inner_positions)
             
-            for i in range(min(num_obstacles, len(positions))):
-                env[positions[i]] = 1
+            # Place obstacles in inner area
+            for i in range(min(num_obstacles, len(inner_positions))):
+                env[inner_positions[i]] = 1
             
-            # Place start and goal
+            # Place start and goal in inner area
             start, goal = self._place_start_goal(env)
             
             # Validate environment
@@ -135,8 +149,13 @@ class EnvironmentGenerator:
         raise RuntimeError(f"Failed to generate valid environment after {self.config.max_generation_attempts} attempts")
     
     def _place_start_goal(self, env: np.ndarray) -> Tuple[Tuple[int, int], Tuple[int, int]]:
-        """Place start and goal positions"""
-        empty_positions = [(i, j) for i in range(env.shape[0]) for j in range(env.shape[1]) if env[i, j] == 0]
+        """Place start and goal positions in inner navigable area"""
+        # Only place start and goal in inner area (excluding walls)
+        inner_start = self.config.wall_padding
+        inner_end = self.config.grid_size + self.config.wall_padding
+        
+        empty_positions = [(i, j) for i in range(inner_start, inner_end) 
+                          for j in range(inner_start, inner_end) if env[i, j] == 0]
         
         if len(empty_positions) < 2:
             raise ValueError("Not enough empty positions for start and goal")
@@ -167,46 +186,41 @@ class EnvironmentGenerator:
 
 class PerceptionExtractor:
     """
-    Extract robot's perception from environment + action history
+    Extract robot's perception from environment + goal direction
     
-    Biological Inspiration: Like how visual cortex processes peripheral 
-    vision combined with hippocampus memory of recent movements.
-    Supports both 3×3 and 5×5 perception windows.
+    Biological Inspiration: Like how animals use peripheral vision combined 
+    with goal-relative spatial awareness (compass-like navigation).
+    
+    State Representation: (local_view, goal_delta) = 11 features
+    - local_view: 3×3 perception = 9 features
+    - goal_delta: (dx, dy) = 2 features
     """
     
-    def __init__(self, history_length: int = 3, perception_size: int = 3):
+    def __init__(self, perception_size: int = 3, use_goal_delta: bool = True):
         """
-        Initialize perception extractor with history tracking
+        Initialize perception extractor with goal-aware navigation
         
         Args:
-            history_length: Number of previous actions to remember
-            perception_size: Size of perception window (3 for 3×3, 5 for 5×5)
+            perception_size: Size of perception window (3 for 3×3)
+            use_goal_delta: If True, include goal relative coordinates
         """
-        self.history_length = history_length
         self.perception_size = perception_size
+        self.use_goal_delta = use_goal_delta
     
-    def extract_perception_view(self, env: np.ndarray, robot_pos: Tuple[int, int]) -> np.ndarray:
-        """Extract perception view around robot position (3×3 or 5×5)"""
-        x, y = robot_pos
-        size = self.perception_size
-        view = np.zeros((size, size))
+    def extract_3x3_view(self, env: np.ndarray, robot_pos: Tuple[int, int]) -> np.ndarray:
+        """
+        Extract 3×3 perception view around robot position
         
-        for i in range(size):
-            for j in range(size):
-                env_x = x + i - (size // 2)  # Center around robot
-                env_y = y + j - (size // 2)
-                
-                if 0 <= env_x < env.shape[0] and 0 <= env_y < env.shape[1]:
-                    view[i, j] = env[env_x, env_y]
-                else:
-                    view[i, j] = 1  # Treat out-of-bounds as obstacles
-        
-        return view
-    
-    @staticmethod
-    def extract_3x3_view(env: np.ndarray, robot_pos: Tuple[int, int]) -> np.ndarray:
-        """Legacy method for 3x3 view (backward compatibility)"""
+        Args:
+            env: Environment grid with wall padding
+            robot_pos: Current robot position (x, y)
+            
+        Returns:
+            3×3 binary grid: 0=free, 1=obstacle/wall
+        """
         x, y = robot_pos
+        
+        # Extract 3×3 view centered on robot
         view = np.zeros((3, 3))
         
         for i in range(3):
@@ -221,52 +235,55 @@ class PerceptionExtractor:
         
         return view
     
-    def extract_enhanced_perception(self, 
-                                    env: np.ndarray, 
-                                    robot_pos: Tuple[int, int],
-                                    action_history: List[int]) -> np.ndarray:
+    def calculate_goal_delta(self, robot_pos: Tuple[int, int], goal_pos: Tuple[int, int]) -> Tuple[int, int]:
         """
-        Extract enhanced perception with action history
+        Calculate relative vector from robot to goal
         
         Args:
-            env: 10×10 environment grid
-            robot_pos: Current robot position
-            action_history: List of previous actions
+            robot_pos: Current robot position (x, y)
+            goal_pos: Goal position (x, y)
             
         Returns:
-            Enhanced feature vector:
-            - Perception features: (perception_size × perception_size)
-            - History features: (history_length × 4 one-hot)
+            (dx, dy): Relative vector from robot to goal
         """
-        # Extract perception (3×3 or 5×5)
-        perception_view = self.extract_perception_view(env, robot_pos)
+        dx = goal_pos[0] - robot_pos[0]  # x-direction
+        dy = goal_pos[1] - robot_pos[1]  # y-direction
+        return (dx, dy)
+    
+    def extract_goal_aware_perception(self, env: np.ndarray, robot_pos: Tuple[int, int], goal_pos: Tuple[int, int]) -> np.ndarray:
+        """
+        Extract complete state representation: (local_view, goal_delta)
+        
+        Args:
+            env: Environment grid with wall padding
+            robot_pos: Current robot position (x, y)
+            goal_pos: Goal position (x, y)
+            
+        Returns:
+            Combined feature vector: 9 perception + 2 goal_delta = 11 features
+        """
+        # Extract 3×3 perception view
+        perception_view = self.extract_3x3_view(env, robot_pos)
         perception_features = perception_view.flatten()
         
-        # Encode action history as one-hot
-        history_features = []
-        recent_actions = action_history[-self.history_length:] if action_history else []
+        # Calculate goal delta
+        goal_delta = self.calculate_goal_delta(robot_pos, goal_pos)
+        goal_features = np.array([goal_delta[0], goal_delta[1]], dtype=np.float32)
         
-        # Pad with zeros if history is shorter than history_length
-        while len(recent_actions) < self.history_length:
-            recent_actions.insert(0, -1)  # Use -1 for "no action yet"
+        # Combine features
+        if self.use_goal_delta:
+            combined_features = np.concatenate([perception_features, goal_features])
+        else:
+            combined_features = perception_features
         
-        # Convert each action to one-hot encoding
-        for action in recent_actions:
-            one_hot = [0, 0, 0, 0]
-            if 0 <= action <= 3:  # Valid action
-                one_hot[action] = 1
-            # If action is -1 (no action yet), leave as [0, 0, 0, 0]
-            history_features.extend(one_hot)
-        
-        # Combine perception and history features
-        enhanced_features = np.concatenate([perception_features, history_features])
-        return enhanced_features.astype(np.float32)
+        return combined_features.astype(np.float32)
+    
     
     def get_feature_count(self) -> int:
         """Get total number of features for current configuration"""
         perception_features = self.perception_size * self.perception_size
-        history_features = self.history_length * 4
-        return perception_features + history_features
+        goal_features = 2 if self.use_goal_delta else 0
+        return perception_features + goal_features
     
     @staticmethod
     def movement_to_action(current_pos: Tuple[int, int], next_pos: Tuple[int, int]) -> int:
@@ -292,21 +309,18 @@ class TrainingDataGenerator:
     def __init__(self, config: TrainingConfig):
         self.config = config
         self.env_generator = EnvironmentGenerator(config)
+        
         self.perception_extractor = PerceptionExtractor(
-            history_length=config.history_length,
-            perception_size=config.perception_size
+            perception_size=config.perception_size,
+            use_goal_delta=config.use_goal_delta
         )
         
-    def generate_complete_dataset(self, use_enhanced: bool = True) -> Tuple[np.ndarray, np.ndarray, List[Dict]]:
+    def generate_complete_dataset(self) -> Tuple[np.ndarray, np.ndarray, List[Dict]]:
         """
         Generate complete training dataset for robot navigation
         
-        Args:
-            use_enhanced: If True, use enhanced perception with action history (21 features)
-                         If False, use basic perception only (9 features)
-        
         Returns:
-        X_train: (n_examples, 21 or 9) - Robot perceptions with/without history
+        X_train: (n_examples, 11) - Robot perceptions with goal delta
         y_train: (n_examples,) - Optimal actions from A*
         metadata: List of environment metadata
         """
@@ -315,20 +329,25 @@ class TrainingDataGenerator:
         all_actions = []
         all_metadata = []
         
-        feature_count = 21 if use_enhanced else 9
+        # Determine feature composition
+        perception_features = self.config.perception_size * self.config.perception_size
+        goal_features = 2 if self.config.use_goal_delta else 0
+        total_features = perception_features + goal_features
+        
         print(f"🧠 Generating training data for {self.config.num_environments} environments...")
-        print(f"📊 Feature mode: {'Enhanced (21 features: 9 perception + 12 history)' if use_enhanced else 'Basic (9 features: perception only)'}")
+        print(f"📊 Environment: {self.config.grid_size}×{self.config.grid_size} inner area with {self.config.wall_padding}-cell wall padding")
+        print(f"📊 State representation: {perception_features} perception + {goal_features} goal_delta = {total_features} features")
         
         for env_idx in range(self.config.num_environments):
             if (env_idx + 1) % 100 == 0:
                 print(f"   Progress: {env_idx + 1}/{self.config.num_environments} environments")
             
             try:
-                # Step 1: Generate 10x10 environment
-                env_10x10, start, goal = self.env_generator.generate_environment()
+                # Step 1: Generate environment with wall padding
+                env_with_walls, start, goal = self.env_generator.generate_environment()
                 
                 # Step 2: Find A* optimal path
-                pathfinder = AStarPathfinder(env_10x10)
+                pathfinder = AStarPathfinder(env_with_walls)
                 a_star_path = pathfinder.find_path(start, goal)
                 
                 if a_star_path is None:
@@ -337,7 +356,6 @@ class TrainingDataGenerator:
                 # Step 3: Extract training examples from path
                 env_perceptions = []
                 env_actions = []
-                action_history = []  # Track action history for enhanced mode
                 
                 for i in range(len(a_star_path) - 1):
                     current_pos = a_star_path[i]
@@ -346,36 +364,33 @@ class TrainingDataGenerator:
                     # Convert movement to action
                     action = self.perception_extractor.movement_to_action(current_pos, next_pos)
                     
-                    if use_enhanced:
-                        # Extract enhanced perception with action history
-                        enhanced_perception = self.perception_extractor.extract_enhanced_perception(
-                            env_10x10, current_pos, action_history
-                        )
-                        env_perceptions.append(enhanced_perception)
-                    else:
-                        # Extract basic 3x3 perception only
-                        perception_3x3 = self.perception_extractor.extract_3x3_view(env_10x10, current_pos)
-                        flattened_perception = perception_3x3.flatten()
-                        env_perceptions.append(flattened_perception)
-                    
+                    # Extract goal-aware perception: (local_view, goal_delta)
+                    goal_aware_perception = self.perception_extractor.extract_goal_aware_perception(
+                        env_with_walls, current_pos, goal
+                    )
+                    env_perceptions.append(goal_aware_perception)
                     env_actions.append(action)
-                    
-                    # Update action history for next iteration
-                    action_history.append(action)
                 
                 # Add to complete dataset
                 all_perceptions.extend(env_perceptions)
                 all_actions.extend(env_actions)
                 
                 # Store metadata
+                # Count obstacles only in inner navigable area (excluding walls)
+                inner_start = self.config.wall_padding
+                inner_end = self.config.grid_size + self.config.wall_padding
+                inner_area = env_with_walls[inner_start:inner_end, inner_start:inner_end]
+                obstacle_count = np.sum(inner_area == 1)
+                
                 metadata = {
                     'env_idx': env_idx,
                     'start': start,
                     'goal': goal,
                     'path_length': len(a_star_path),
-                    'obstacle_count': np.sum(env_10x10 == 1),
-                    'obstacle_density': np.sum(env_10x10 == 1) / env_10x10.size,
-                    'path': a_star_path
+                    'obstacle_count': obstacle_count,
+                    'obstacle_density': obstacle_count / (self.config.grid_size * self.config.grid_size),
+                    'path': a_star_path,
+                    'wall_padding': self.config.wall_padding
                 }
                 all_metadata.append(metadata)
                 
@@ -409,10 +424,10 @@ class TrainingDataGenerator:
         
         # Feature breakdown
         feature_size = X_train.shape[1] if len(X_train.shape) > 1 else 1
-        if feature_size == 21:
-            print(f"Feature mode: Enhanced (9 perception + 12 history = 21 features)")
+        if feature_size == 11:
+            print(f"Feature mode: Goal-aware (9 perception + 2 goal_delta = 11 features)")
         elif feature_size == 9:
-            print(f"Feature mode: Basic (9 perception features)")
+            print(f"Feature mode: Basic (9 perception features only)")
         else:
             print(f"Feature mode: Unknown ({feature_size} features)")
         
@@ -455,7 +470,7 @@ class TrainingDataGenerator:
 
 def visualize_environment(env: np.ndarray, start: Tuple[int, int], goal: Tuple[int, int], 
                          path: List[Tuple[int, int]], title: str = "Sample Environment") -> None:
-    """Visualize a sample environment with path"""
+    """Visualize a sample environment with path and wall padding"""
     
     # Create visualization
     vis_env = env.copy().astype(float)
@@ -468,7 +483,7 @@ def visualize_environment(env: np.ndarray, start: Tuple[int, int], goal: Tuple[i
     
     plt.figure(figsize=(10, 8))
     plt.imshow(vis_env, cmap='viridis')
-    plt.title(title)
+    plt.title(f"{title} (with wall padding)")
     plt.xlabel('X')
     plt.ylabel('Y')
     
@@ -476,28 +491,38 @@ def visualize_environment(env: np.ndarray, start: Tuple[int, int], goal: Tuple[i
     plt.text(start[1], start[0], 'R', ha='center', va='center', fontsize=16, color='white', weight='bold')
     plt.text(goal[1], goal[0], 'G', ha='center', va='center', fontsize=16, color='white', weight='bold')
     
+    # Add grid to show inner navigable area
+    inner_size = env.shape[0] - 2  # Assuming 1-cell wall padding
+    for i in range(inner_size + 1):
+        plt.axhline(y=0.5 + i, color='white', alpha=0.3, linewidth=0.5)
+        plt.axvline(x=0.5 + i, color='white', alpha=0.3, linewidth=0.5)
+    
     # Add colorbar
     cbar = plt.colorbar()
-    cbar.set_label('Cell Type')
+    cbar.set_label('Cell Type (0=free, 1=obstacle/wall)')
     
     plt.show()
 
 
 def visualize_training_examples(X_train: np.ndarray, y_train: np.ndarray, num_examples: int = 9) -> None:
-    """Visualize sample training examples"""
+    """Visualize sample training examples with goal delta information"""
     
     action_names = ['UP', 'DOWN', 'LEFT', 'RIGHT']
     
-    fig, axes = plt.subplots(3, 3, figsize=(12, 12))
+    fig, axes = plt.subplots(3, 3, figsize=(15, 12))
     axes = axes.flatten()
     
     for i in range(min(num_examples, len(X_train))):
-        # Reshape flattened perception back to 3x3
-        perception = X_train[i].reshape(3, 3)
+        # Extract 3x3 perception and goal delta
+        perception = X_train[i][:9].reshape(3, 3)  # First 9 features
+        goal_delta = X_train[i][9:11]  # Last 2 features (dx, dy)
         action = y_train[i]
         
         axes[i].imshow(perception, cmap='gray', vmin=0, vmax=1)
-        axes[i].set_title(f'Action: {action_names[action]}')
+        
+        # Create title with goal delta info
+        title = f'Action: {action_names[action]}\nGoal Δ: ({goal_delta[0]:.0f}, {goal_delta[1]:.0f})'
+        axes[i].set_title(title, fontsize=10)
         axes[i].set_xlabel('X')
         axes[i].set_ylabel('Y')
         

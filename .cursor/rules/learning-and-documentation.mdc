@@ -1,10 +1,9 @@
 ---
-alwaysApply: true
-description: Learning methodology and documentation standards
+alwaysApply: false
 ---
-
 # Learning and Documentation Standards
-
+- Keep documentation concise short and to the point
+- Don't always generate documentation unless asked.
 ## Learning Methodology
 
 ### Step-by-Step Learning Approach
@@ -115,35 +114,6 @@ Create visual or textual maps showing:
 4. **Execute**: Run the experiment and collect data
 5. **Analyze**: Interpret results in context of hypothesis
 6. **Document**: Record findings and new questions
-
-### Iterative Refinement
-```python
-def iterative_learning_process():
-    """
-    Example of how to structure iterative learning
-    
-    Biological Connection: Mimics how brains learn through repetition
-    Mathematical Basis: Convergence through iterative improvement
-    """
-    for iteration in range(max_iterations):
-        # 1. Make prediction
-        prediction = model(input_data)
-        
-        # 2. Compare with target
-        error = target - prediction
-        
-        # 3. Learn from error (biological: synaptic plasticity)
-        model.update_weights(error)
-        
-        # 4. Document progress
-        if iteration % 100 == 0:
-            print(f"Iteration {iteration}: Error = {error:.6f}")
-            
-        # 5. Check for convergence
-        if abs(error) < tolerance:
-            print(f"✅ Converged after {iteration} iterations")
-            break
-```
 
 ## Quality Assurance
 

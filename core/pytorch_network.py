@@ -3,7 +3,7 @@
 ===========================================================
 
 Biological Inspiration:
-- Mimics animal navigation with limited 3×3 perception
+- Mimics animal navigation with limited 3×3 perception + goal awareness
 - ReLU activation mimics spiking neurons
 - Dropout simulates neural noise and robustness
 
@@ -13,7 +13,7 @@ Mathematical Foundation:
 - Dropout for regularization
 
 Learning Objective:
-Train robot to map 3×3 obstacle patterns to navigation actions using PyTorch
+Train robot to map (3×3 obstacle patterns + goal direction) to navigation actions using PyTorch
 """
 
 import torch
@@ -34,6 +34,7 @@ import os
 """
 🧠 NEUROSCIENCE CONNECTION:
 - Local perception: Animals use limited peripheral vision for navigation
+- Goal awareness: Animals use compass-like spatial awareness for navigation
 - Pattern recognition: Brain learns obstacle-action relationships
 - Robustness: Neural networks work despite individual neuron failures
 - Competition: Softmax mimics neural competition for activation
@@ -58,19 +59,16 @@ class RobotNavigationNet(nn.Module):
     """
     PyTorch Neural Network for Robot Navigation
     
-    Architecture (Enhanced with Memory):
-    Input(Variable) → Hidden1(64) → Hidden2(32) → Output(4)
-    - Input: perception_features + history_features
-    - Supports 3×3 (9 features) or 5×5 (25 features) perception
+    Architecture (Goal-Aware):
+    Input(11) → Hidden1(64) → Hidden2(32) → Output(4)
+    - Input: 9 perception features + 2 goal_delta features
     - ReLU + Dropout(0.2) + Softmax
-    
-    Also supports basic mode with Input(9) for backward compatibility
     """
     
     def __init__(self, 
-                 input_size: int = 37,           # Default: 25 (5×5 perception) + 12 (history)
-                 perception_size: int = 25,      # 5×5 perception grid (or 9 for 3×3)
-                 history_size: int = 12,         # 3 actions × 4 one-hot encoding
+                 input_size: int = 11,           # Default: 9 perception + 2 goal_delta
+                 perception_size: int = 9,       # 3×3 perception grid
+                 goal_features: int = 2,         # goal_delta (dx, dy)
                  hidden1_size: int = 64,
                  hidden2_size: int = 32,
                  output_size: int = 4,
@@ -79,9 +77,9 @@ class RobotNavigationNet(nn.Module):
         Initialize PyTorch neural network
         
         Args:
-            input_size: Total input size (21 for enhanced, 9 for basic)
+            input_size: Total input size (11 for goal-aware, 9 for basic)
             perception_size: Size of perception features (9)
-            history_size: Size of history features (12)
+            goal_features: Size of goal delta features (2)
             hidden1_size: First hidden layer (64 neurons)
             hidden2_size: Second hidden layer (32 neurons) 
             output_size: 4 navigation actions
@@ -91,7 +89,7 @@ class RobotNavigationNet(nn.Module):
         
         self.input_size = input_size
         self.perception_size = perception_size
-        self.history_size = history_size
+        self.goal_features = goal_features
         self.hidden1_size = hidden1_size
         self.hidden2_size = hidden2_size
         self.output_size = output_size
@@ -121,7 +119,7 @@ class RobotNavigationNet(nn.Module):
         Forward pass through the network
         
         Args:
-            x: Input tensor (batch_size, 9)
+            x: Input tensor (batch_size, 11) - 9 perception + 2 goal_delta
             
         Returns:
             output: Predicted probabilities (batch_size, 4)
@@ -156,21 +154,15 @@ class RobotNavigationNet(nn.Module):
         total_params = sum(p.numel() for p in self.parameters())
         trainable_params = sum(p.numel() for p in self.parameters() if p.requires_grad)
         
-        # Determine mode based on input size and perception size
-        if self.perception_size == 25:
-            mode = "Enhanced 5×5"
-        elif self.perception_size == 9:
-            mode = "Enhanced 3×3"
+        # Determine mode based on input size and feature composition
+        if self.input_size == 11:
+            mode = "Goal-Aware 3×3"
         elif self.input_size == 9:
             mode = "Basic 3×3"
         else:
             mode = "Custom"
         
-        feature_breakdown = f" ({self.perception_size} perception + {self.history_size} history)"
-        if self.perception_size == 25:
-            feature_breakdown = " (25 perception + 12 history)"
-        elif self.perception_size == 9:
-            feature_breakdown = " (9 perception + 12 history)"
+        feature_breakdown = f" ({self.perception_size} perception + {self.goal_features} goal_delta)"
         
         return {
             'architecture': f"{self.input_size} → {self.hidden1_size} → {self.hidden2_size} → {self.output_size}",
