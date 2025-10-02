@@ -13,22 +13,8 @@ num_environments: 1000
 max_generation_attempts: 100
 
 # Perception Settings
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-perception_size: 3  # Perception window size (3 for 3×3, 5 for 5×5)
-=======
 perception_size: 3  # Perception window size (3×3 only for original solution)
 use_goal_delta: true  # Include goal relative coordinates (dx, dy)
->>>>>>> Stashed changes
-=======
-perception_size: 3  # Perception window size (3×3 only for original solution)
-use_goal_delta: true  # Include goal relative coordinates (dx, dy)
->>>>>>> Stashed changes
-=======
-perception_size: 3  # Perception window size (3×3 only for original solution)
-use_goal_delta: true  # Include goal relative coordinates (dx, dy)
->>>>>>> Stashed changes
 
 # Dataset Sizes
 small_dataset:

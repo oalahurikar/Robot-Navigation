@@ -1,602 +1,407 @@
+#!/usr/bin/env python3
 """
-🤖 ROBOT NAVIGATION NEURAL NETWORK TRAINING
-==========================================
+🤖 Robot Navigation Neural Network Training Script
+==================================================
 
-This script demonstrates how to train the neural network for robot navigation
-using the generated training data.
+Train neural networks for goal-aware robot navigation.
 
 Usage:
-    python scripts/train_nn.py
-
-Features:
-- Loads training data from data/raw/small_training_dataset.npz
-- Creates train/validation/test splits
-- Trains neural network with early stopping
-- Saves trained model and training history
-- Generates performance analysis
+    python scripts/train_nn.py                    # Goal-aware mode (11 features)
+    python scripts/train_nn.py --basic            # Basic mode (9 features)
 """
 
 import sys
-import os
-import numpy as np
-import matplotlib.pyplot as plt
-import yaml
 import argparse
 from pathlib import Path
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import DataLoader, TensorDataset
+from sklearn.model_selection import train_test_split
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
-sys.path.append(str(project_root))
+sys.path.insert(0, str(project_root))
 
-from core.pytorch_network import RobotNavigationNet, RobotNavigationTrainer, load_config, create_data_loaders
 from core.data_generation import load_training_data
+from core.pytorch_network import load_config, RobotNavigationNet
 
-# =============================================================================
-# CONFIGURATION LOADING
-# =============================================================================
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-def load_config(config_path: str = None) -> dict:
-=======
 def get_dataset_filename(use_goal_delta: bool = True) -> str:
->>>>>>> Stashed changes
-=======
-def get_dataset_filename(use_goal_delta: bool = True) -> str:
->>>>>>> Stashed changes
-=======
-def get_dataset_filename(use_goal_delta: bool = True) -> str:
->>>>>>> Stashed changes
-    """
-    Load configuration from YAML file
-    
-    Args:
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        config_path: Path to configuration file
-        
-=======
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-        use_goal_delta: True for goal-aware mode, False for basic mode
-    
->>>>>>> Stashed changes
-    Returns:
-        Configuration dictionary
-    """
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    if config_path is None:
-        config_path = project_root / "configs" / "nn_config.yaml"
-    
-=======
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+    """Get the appropriate dataset filename based on mode"""
     if use_goal_delta:
-        return "large_training_dataset.npz"  # Goal-aware mode (default)
+        return "large_training_dataset.npz"
     else:
-        return "large_training_dataset_basic.npz"  # Basic mode
+        return "large_training_dataset_basic.npz"
+
 
 def load_data(use_goal_delta: bool = True, verbose: bool = True):
     """
-    Load training data with automatic mode detection
+    Load training data for robot navigation
     
     Args:
-        use_goal_delta: True for goal-aware mode, False for basic mode
-        verbose: Print loading information
-    
+        use_goal_delta: If True, use goal-aware mode (11 features), else basic mode (9 features)
+        verbose: Whether to print loading information
+        
     Returns:
-        X, y, metadata, is_goal_aware
+        X: Input features
+        y: Target actions
+        metadata: Environment metadata
+        is_goal_aware: Boolean indicating if goal-aware mode was detected
     """
-    # Get filename
+    # Determine data filename
     data_filename = get_dataset_filename(use_goal_delta)
     data_path = project_root / "data" / "raw" / data_filename
     
     if verbose:
         print(f"📂 Loading data: {data_filename}")
     
-    # Load data
->>>>>>> Stashed changes
-    try:
-        with open(config_path, 'r') as f:
-            config = yaml.safe_load(f)
-        print(f"✅ Configuration loaded from {config_path}")
-        return config
-    except FileNotFoundError:
-<<<<<<< Updated upstream
-        print(f"❌ Configuration file not found: {config_path}")
-        print("💡 Using default configuration...")
-        return get_default_config()
-    except yaml.YAMLError as e:
-        print(f"❌ Error parsing YAML configuration: {e}")
-        print("💡 Using default configuration...")
-        return get_default_config()
-=======
-        print(f"❌ Data file not found: {data_filename}")
-        print(f"💡 Generate data first with:")
-        if use_goal_delta:
-            print(f"   python scripts/generate_data.py large")
-        else:
-            print(f"   python scripts/generate_data.py large --basic")
-        raise
+    if not data_path.exists():
+        print(f"❌ Dataset not found: {data_path}")
+        print(f"💡 Generate data first: python scripts/generate_data.py large{' --basic' if not use_goal_delta else ''}")
+        sys.exit(1)
     
-    # Detect mode from data
+    # Load data
+    X, y, metadata = load_training_data(str(data_path))
+    
+    # Detect actual mode from data
     feature_count = X.shape[1]
     is_goal_aware = feature_count == 11
     
     if verbose:
         mode_type = "Goal-Aware 🎯" if is_goal_aware else "Basic"
-        print(f"✅ Data loaded: {X.shape[0]} samples")
-        print(f"   Features: {X.shape[1]} ({mode_type})")
+        print(f"✅ Data loaded: {len(X)} samples")
+        print(f"   Features: {feature_count} ({mode_type})")
         print(f"   Environments: {len(metadata)}")
     
     return X, y, metadata, is_goal_aware
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
-def get_default_config() -> dict:
-    """Get default configuration if YAML file is not available"""
-    return {
-        'model': {
-            'input_size': 9,
-            'hidden1_size': 64,
-            'hidden2_size': 32,
-            'output_size': 4,
-            'dropout_rate': 0.2,
-            'learning_rate': 0.001
-        },
-        'training': {
-            'epochs': 100,
-            'batch_size': 32,
-            'early_stopping_patience': 15
-        },
-        'data': {
-            'train_ratio': 0.8,
-            'val_ratio': 0.1,
-            'test_ratio': 0.1
-        },
-        'model_save': {
-            'model_dir': 'data/models/final_models',
-            'model_filename': 'robot_navigation_nn.pkl',
-            'history_filename': 'training_history.png'
-        }
-    }
 
-# =============================================================================
-# FILE PATHS
-# =============================================================================
-
-# Default file paths
-DATA_PATH = project_root / "data" / "raw" / "small_training_dataset.npz"
-
-# =============================================================================
-# MAIN TRAINING FUNCTION
-# =============================================================================
-
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-def main(config_path: str = None, perception_mode: str = "3x3"):
-=======
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-def train_model(use_goal_delta: bool = True,
-                config_path: str = None,
-                verbose: bool = True):
->>>>>>> Stashed changes
+def prepare_data_loaders(X, y, config, test_size=0.1, val_size=0.1, random_state=42):
     """
-    Main training pipeline
+    Prepare data loaders for training, validation, and testing
     
     Args:
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        config_path: Path to configuration file
-        perception_mode: "3x3" or "5x5" perception mode
-    """
-    print("🤖 ROBOT NAVIGATION NEURAL NETWORK TRAINING")
-    print("=" * 60)
-    
-    # 1. Load configuration
-    print("📋 Loading configuration...")
-    config = load_config(config_path, perception_mode)
-    
-    # Extract configuration sections
-    model_config = config['model']
-    training_config = config['training']
-    data_config = config['data']
-    save_config = config['model_save']
-    
-    # 2. Load training data
-    print("\n📂 Loading training data...")
-    try:
-        X, y = load_training_data(DATA_PATH)
-        print(f"✅ Data loaded: {X.shape[0]} samples, {X.shape[1]} features")
-        print(f"📊 Data types: X={X.dtype}, y={y.dtype}")
-        print(f"🎯 Action distribution: {np.bincount(y)}")
-    except FileNotFoundError:
-        print(f"❌ Data file not found: {DATA_PATH}")
-        print("💡 Run 'python scripts/generate_data.py' first to generate training data")
-        return
-=======
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-        use_goal_delta: True for goal-aware mode, False for basic mode
-        config_path: Path to config file (None = default)
-        verbose: Print training progress
-    
+        X: Input features
+        y: Target actions
+        config: Model configuration
+        test_size: Fraction of data for testing
+        val_size: Fraction of remaining data for validation
+        random_state: Random seed for reproducibility
+        
     Returns:
-        trainer, history, test_metrics
+        train_loader, val_loader, test_loader: DataLoaders for each split
     """
-    if verbose:
-        print("🚀 ROBOT NAVIGATION NEURAL NETWORK TRAINING")
-        print("=" * 60)
-        print(f"   Mode: {'Goal-Aware' if use_goal_delta else 'Basic'}")
-        print(f"   Features: {'11 (9 perception + 2 goal_delta)' if use_goal_delta else '9 (perception only)'}")
-    
-    # 1. Load configuration
-    config = load_config(goal_aware=use_goal_delta)
-    
-    # 2. Load data
-    X, y, metadata, is_goal_aware = load_data(use_goal_delta, verbose)
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-    
-    # 3. Create data loaders
-    print("\n📊 Creating data loaders...")
-    train_loader, val_loader, test_loader = create_data_loaders(
-        X, y,
-        batch_size=training_config['batch_size'],
-        train_ratio=data_config['train_ratio'],
-        val_ratio=data_config['val_ratio'],
-        test_ratio=data_config['test_ratio']
+    # Split data
+    X_temp, X_test, y_temp, y_test = train_test_split(
+        X, y, test_size=test_size, random_state=random_state, stratify=y
     )
     
-    # 4. Initialize neural network
-    print("\n🧠 Initializing PyTorch neural network...")
+    val_size_adjusted = val_size / (1 - test_size)  # Adjust val_size for remaining data
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_temp, y_temp, test_size=val_size_adjusted, random_state=random_state, stratify=y_temp
+    )
+    
+    # Convert to tensors
+    X_train = torch.FloatTensor(X_train)
+    y_train = torch.LongTensor(y_train)
+    X_val = torch.FloatTensor(X_val)
+    y_val = torch.LongTensor(y_val)
+    X_test = torch.FloatTensor(X_test)
+    y_test = torch.LongTensor(y_test)
+    
+    # Create datasets
+    train_dataset = TensorDataset(X_train, y_train)
+    val_dataset = TensorDataset(X_val, y_val)
+    test_dataset = TensorDataset(X_test, y_test)
+    
+    # Create data loaders
+    batch_size = config['training']['batch_size']
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+    
+    if len(X) > 0:  # Only print if we have data
+        print(f"📊 Data splits:")
+        print(f"   Train: {len(X_train)} samples")
+        print(f"   Validation: {len(X_val)} samples")
+        print(f"   Test: {len(X_test)} samples")
+    
+    return train_loader, val_loader, test_loader
+
+
+def create_model(config):
+    """Create neural network model"""
     model = RobotNavigationNet(
-        input_size=model_config['input_size'],
-        hidden1_size=model_config['hidden1_size'],
-        hidden2_size=model_config['hidden2_size'],
-        output_size=model_config['output_size'],
-        dropout_rate=model_config['dropout_rate']
+        input_size=config['model']['input_size'],
+        hidden1_size=config['model']['hidden1_size'],
+        hidden2_size=config['model']['hidden2_size'],
+        output_size=config['model']['output_size'],
+        dropout_rate=config['model']['dropout_rate']
     )
+    return model
+
+
+def create_trainer(model, config):
+    """Create trainer with optimizer and loss function"""
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model.to(device)
     
-    # Create trainer
-    trainer = RobotNavigationTrainer(
-        model=model,
-        learning_rate=model_config['learning_rate']
-    )
+    optimizer = optim.Adam(model.parameters(), lr=config['training']['learning_rate'])
+    criterion = nn.CrossEntropyLoss()
     
-    print(f"✅ Model created with architecture:")
-    print(f"   {model.get_architecture_info()['architecture']}")
-    print(f"   Total parameters: {model.get_architecture_info()['total_parameters']}")
-    print(f"   Device: {trainer.device}")
+    class Trainer:
+        def __init__(self, model, optimizer, criterion, device):
+            self.model = model
+            self.optimizer = optimizer
+            self.criterion = criterion
+            self.device = device
+        
+        def train(self, train_loader, val_loader, epochs=100, early_stopping_patience=15, verbose=True):
+            """Train the model"""
+            history = {'train_losses': [], 'train_accuracies': [], 'val_losses': [], 'val_accuracies': []}
+            best_val_loss = float('inf')
+            patience_counter = 0
+            
+            if verbose:
+                print(f"🚀 Starting training on {device}")
+                print(f"🧠 Architecture: {self.model.get_architecture_info()['architecture']}")
+                print(f"⚙️  Learning rate: {self.optimizer.param_groups[0]['lr']}")
+                print(f"🛡️  Dropout rate: {self.model.dropout_rate}")
+                print("-" * 60)
+            
+            for epoch in range(epochs):
+                # Training phase
+                self.model.train()
+                train_loss = 0.0
+                train_correct = 0
+                train_total = 0
+                
+                for batch_X, batch_y in train_loader:
+                    batch_X, batch_y = batch_X.to(self.device), batch_y.to(self.device)
+                    
+                    self.optimizer.zero_grad()
+                    outputs = self.model(batch_X)
+                    loss = self.criterion(outputs, batch_y)
+                    loss.backward()
+                    self.optimizer.step()
+                    
+                    train_loss += loss.item()
+                    _, predicted = torch.max(outputs.data, 1)
+                    train_total += batch_y.size(0)
+                    train_correct += (predicted == batch_y).sum().item()
+                
+                # Validation phase
+                val_loss, val_accuracy = self.evaluate(val_loader)
+                
+                # Record history
+                train_accuracy = train_correct / train_total
+                history['train_losses'].append(train_loss / len(train_loader))
+                history['train_accuracies'].append(train_accuracy)
+                history['val_losses'].append(val_loss)
+                history['val_accuracies'].append(val_accuracy)
+                
+                # Early stopping
+                if val_loss < best_val_loss:
+                    best_val_loss = val_loss
+                    patience_counter = 0
+                else:
+                    patience_counter += 1
+                
+                if verbose and epoch % 10 == 0:
+                    print(f"Epoch {epoch:3d}: Train Loss={history['train_losses'][-1]:.4f}, Train Acc={train_accuracy:.2%}, "
+                          f"Val Loss={val_loss:.4f}, Val Acc={val_accuracy:.2%}")
+                
+                if patience_counter >= early_stopping_patience:
+                    if verbose:
+                        print(f"🛑 Early stopping at epoch {epoch} (patience={early_stopping_patience})")
+                        print(f"✅ Training completed! Best validation loss: {best_val_loss:.4f}")
+                    break
+            
+            return history
+        
+        def evaluate(self, data_loader):
+            """Evaluate model on data"""
+            self.model.eval()
+            total_loss = 0.0
+            correct = 0
+            total = 0
+            
+            with torch.no_grad():
+                for batch_X, batch_y in data_loader:
+                    batch_X, batch_y = batch_X.to(self.device), batch_y.to(self.device)
+                    outputs = self.model(batch_X)
+                    loss = self.criterion(outputs, batch_y)
+                    
+                    total_loss += loss.item()
+                    _, predicted = torch.max(outputs.data, 1)
+                    total += batch_y.size(0)
+                    correct += (predicted == batch_y).sum().item()
+            
+            return total_loss / len(data_loader), correct / total
     
-    # 5. Train the model
-    print("\n🚀 Starting training...")
-    history = trainer.train(
-        train_loader, val_loader,
-        epochs=training_config['epochs'],
-        early_stopping_patience=training_config['early_stopping_patience']
-    )
-    
-    # 6. Evaluate on test set
-    print("\n🎯 Evaluating on test set...")
-    test_loss, test_accuracy = trainer.evaluate(test_loader)
-    print(f"📊 Test Results:")
-    print(f"   Loss: {test_loss:.4f}")
-    print(f"   Accuracy: {test_accuracy:.2f}%")
-    
-    # 7. Detailed analysis
-    print("\n📈 Detailed Performance Analysis:")
-    # Get predictions for analysis
+    return Trainer(model, optimizer, criterion, device)
+
+
+def get_predictions(model, data_loader, device):
+    """Get model predictions"""
     model.eval()
     all_predictions = []
     all_targets = []
     
     with torch.no_grad():
-        for data, target in test_loader:
-            data = data.to(trainer.device)
-            output = model(data)
-            pred = output.argmax(dim=1)
-            all_predictions.extend(pred.cpu().numpy())
-            all_targets.extend(target.numpy())
+        for batch_X, batch_y in data_loader:
+            batch_X, batch_y = batch_X.to(device), batch_y.to(device)
+            outputs = model(batch_X)
+            _, predicted = torch.max(outputs.data, 1)
+            
+            all_predictions.extend(predicted.cpu().numpy())
+            all_targets.extend(batch_y.cpu().numpy())
     
-    # Calculate accuracy
-    accuracy = np.mean(np.array(all_predictions) == np.array(all_targets))
-    print(f"   Manual accuracy calculation: {accuracy:.4f}")
-    
-    # Action distribution
-    action_names = ['UP', 'DOWN', 'LEFT', 'RIGHT']
-    print(f"   Action distribution in test set: {np.bincount(all_targets)}")
-    print(f"   Predicted action distribution: {np.bincount(all_predictions)}")
-    
-    # 8. Save model and results
-    print("\n💾 Saving model and results...")
-    
-    # Create file paths from config
-    model_dir = project_root / save_config['model_dir']
-    model_path = model_dir / save_config['model_filename']
-    history_path = project_root / "data" / "results" / "visualizations" / save_config['history_filename']
-    
-    # Create directories if they don't exist
-    model_path.parent.mkdir(parents=True, exist_ok=True)
-    history_path.parent.mkdir(parents=True, exist_ok=True)
-    
-    # Save model
-    trainer.save_model(str(model_path))
-    
-    # Save training history plot
-    trainer.plot_training_history(str(history_path))
-    
-    # 9. Print summary
-    print("\n" + "=" * 60)
-    print("🎉 TRAINING COMPLETED SUCCESSFULLY!")
-    print("=" * 60)
-    print(f"📊 Final Test Accuracy: {test_accuracy:.2f}%")
-    print(f"💾 Model saved to: {model_path}")
-    print(f"📈 Training history saved to: {history_path}")
-    print(f"🧠 Architecture: {model.get_architecture_info()['architecture']}")
-    print(f"⚙️  Hyperparameters: lr={model_config['learning_rate']}, dropout={model_config['dropout_rate']}")
-    print(f"🖥️  Device: {trainer.device}")
-    
-    # Training statistics
-    final_epoch = len(history['train_losses'])
-    best_val_loss = min(history['val_losses'])
-    best_val_acc = max(history['val_accuracies'])
-    
-    print(f"\n📈 Training Statistics:")
-    print(f"   Epochs trained: {final_epoch}")
-    print(f"   Best validation loss: {best_val_loss:.4f}")
-    print(f"   Best validation accuracy: {best_val_acc:.2f}%")
-    
-    return trainer, history
+    return np.array(all_predictions), np.array(all_targets)
 
-# =============================================================================
-# HYPERPARAMETER TUNING EXAMPLE
-# =============================================================================
 
-def hyperparameter_tuning_example():
-    """
-    Example of how to perform hyperparameter tuning
-    """
-    print("\n🔧 HYPERPARAMETER TUNING EXAMPLE")
-    print("=" * 40)
+def calculate_metrics(predictions, targets):
+    """Calculate classification metrics"""
+    from sklearn.metrics import precision_score, recall_score, f1_score
+    
+    precision = precision_score(targets, predictions, average='macro')
+    recall = recall_score(targets, predictions, average='macro')
+    f1 = f1_score(targets, predictions, average='macro')
+    
+    return {'precision': precision, 'recall': recall, 'f1': f1}
+
+
+def train_model(use_goal_delta: bool = True, verbose: bool = True):
+    """Main training function"""
+    # Load configuration
+    config = load_config(goal_aware=use_goal_delta)
     
     # Load data
-    X, y = load_training_data(DATA_PATH)
-    X_train, X_val, X_test, y_train, y_val, y_test = create_data_splits(X, y)
+    X, y, metadata, is_goal_aware = load_data(use_goal_delta, verbose)
     
-    # Hyperparameter grid
-    learning_rates = [0.001, 0.01, 0.1]
-    dropout_rates = [0.1, 0.2, 0.3]
-    hidden_sizes = [(32, 16), (64, 32), (128, 64)]
+    # Prepare data loaders
+    train_loader, val_loader, test_loader = prepare_data_loaders(X, y, config)
     
-    best_accuracy = 0
-    best_config = None
+    # Create model and trainer
+    model = create_model(config)
+    trainer = create_trainer(model, config)
     
-    print("🔍 Testing hyperparameter combinations...")
+    if verbose:
+        mode_type = "Goal-Aware" if is_goal_aware else "Basic"
+        print(f"🧠 Training {mode_type} Neural Network")
+        print(f"📊 Input features: {X.shape[1]}")
     
-    for lr in learning_rates:
-        for dropout in dropout_rates:
-            for h1_size, h2_size in hidden_sizes:
-                print(f"\n🧪 Testing: lr={lr}, dropout={dropout}, hidden=({h1_size}, {h2_size})")
-                
-                # Create model with current hyperparameters
-                model = RobotNavigationNN(
-                    input_size=9,
-                    hidden1_size=h1_size,
-                    hidden2_size=h2_size,
-                    output_size=4,
-                    dropout_rate=dropout,
-                    learning_rate=lr
-                )
-                
-                # Train for fewer epochs for tuning
-                model.train(X_train, y_train, X_val, y_val, epochs=20, batch_size=32)
-                
-                # Evaluate
-                _, val_accuracy = model.evaluate(X_val, y_val)
-                print(f"   Validation accuracy: {val_accuracy:.4f}")
-                
-                # Track best configuration
-                if val_accuracy > best_accuracy:
-                    best_accuracy = val_accuracy
-                    best_config = {
-                        'learning_rate': lr,
-                        'dropout_rate': dropout,
-                        'hidden1_size': h1_size,
-                        'hidden2_size': h2_size
-                    }
+    # Train model
+    history = trainer.train(
+        train_loader, 
+        val_loader, 
+        epochs=config['training']['epochs'],
+        early_stopping_patience=config['training']['early_stopping']['patience'],
+        verbose=verbose
+    )
     
-    print(f"\n🏆 Best configuration:")
-    print(f"   Accuracy: {best_accuracy:.4f}")
-    print(f"   Config: {best_config}")
+    # Evaluate on test set
+    test_accuracy, test_loss = trainer.evaluate(test_loader)
     
-    return best_config, best_accuracy
+    if verbose:
+        print(f"\n📊 Test Set Performance:")
+        print(f"   Accuracy: {test_accuracy:.4f} ({test_accuracy*100:.1f}%)")
+        print(f"   Loss: {test_loss:.4f}")
+    
+    # Calculate additional metrics
+    predictions, targets = get_predictions(model, test_loader, trainer.device)
+    metrics = calculate_metrics(predictions, targets)
+    
+    return trainer, history, metrics
 
-# =============================================================================
-# MODEL COMPARISON EXAMPLE
-# =============================================================================
 
-def compare_architectures():
-    """
-    Compare different neural network architectures
-    """
-    print("\n🏗️ ARCHITECTURE COMPARISON")
-    print("=" * 40)
-    
-    # Load data
-    X, y = load_training_data(DATA_PATH)
-    X_train, X_val, X_test, y_train, y_val, y_test = create_data_splits(X, y)
-    
-    # Different architectures to test
-    architectures = [
-        {"name": "Small", "hidden1": 32, "hidden2": 16},
-        {"name": "Medium", "hidden1": 64, "hidden2": 32},
-        {"name": "Large", "hidden1": 128, "hidden2": 64},
-        {"name": "Deep", "hidden1": 64, "hidden2": 32, "hidden3": 16}
-    ]
-    
-    results = []
-    
-    for arch in architectures:
-        print(f"\n🧪 Testing {arch['name']} architecture...")
-        
-        # Create model (simplified for this example)
-        model = RobotNavigationNN(
-            input_size=9,
-            hidden1_size=arch['hidden1'],
-            hidden2_size=arch['hidden2'],
-            output_size=4,
-            dropout_rate=0.2,
-            learning_rate=0.001
-        )
-        
-        # Train briefly
-        model.train(X_train, y_train, X_val, y_val, epochs=20)
-        
-        # Evaluate
-        _, test_accuracy = model.evaluate(X_test, y_test)
-        results.append({
-            'name': arch['name'],
-            'accuracy': test_accuracy,
-            'params': arch['hidden1'] * arch['hidden2']  # Approximate parameter count
-        })
-        
-        print(f"   Test accuracy: {test_accuracy:.4f}")
-    
-    # Print comparison
-    print(f"\n📊 Architecture Comparison:")
-    print("Architecture | Accuracy | Parameters")
-    print("-" * 40)
-    for result in results:
-        print(f"{result['name']:12} | {result['accuracy']:.4f}   | {result['params']:10}")
-    
-    return results
-
-# =============================================================================
-# MAIN EXECUTION
-# =============================================================================
-
-if __name__ == "__main__":
-    """
-    Run the training pipeline with command line arguments
-    """
-    # Parse command line arguments
+def main():
+    """Main function"""
     parser = argparse.ArgumentParser(description='Train Robot Navigation Neural Network')
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
     parser.add_argument('--basic', action='store_true',
                        help='Use basic mode (9 features) instead of goal-aware mode (11 features)')
->>>>>>> Stashed changes
-=======
-    parser.add_argument('--basic', action='store_true',
-                       help='Use basic mode (9 features) instead of goal-aware mode (11 features)')
->>>>>>> Stashed changes
-=======
-    parser.add_argument('--basic', action='store_true',
-                       help='Use basic mode (9 features) instead of goal-aware mode (11 features)')
->>>>>>> Stashed changes
     parser.add_argument('--config', type=str, default=None,
-                       help='Path to configuration file (default: configs/nn_config.yaml)')
-    parser.add_argument('--perception', choices=['3x3', '5x5'], default='3x3',
-                       help='Perception window size (auto-selects config)')
-    parser.add_argument('--hyperparameter-tuning', action='store_true',
-                       help='Run hyperparameter tuning experiments')
-    parser.add_argument('--architecture-comparison', action='store_true',
-                       help='Run architecture comparison experiments')
+                       help='Path to configuration file')
     
     args = parser.parse_args()
     
-    # Use unified config with perception mode
-    if args.config is None:
-        args.config = 'configs/nn_config.yaml'
-        print(f"🎯 Using unified config with {args.perception} perception mode: {args.config}")
+    # Determine mode
+    use_goal_delta = not args.basic
+    mode_type = "Goal-Aware" if use_goal_delta else "Basic"
+    
+    print(f"🤖 ROBOT NAVIGATION NEURAL NETWORK TRAINING")
+    print("=" * 60)
+    print(f"   Mode: {mode_type}")
+    print(f"   Features: {'11 (9 perception + 2 goal_delta)' if use_goal_delta else '9 (perception only)'}")
+    print(f"   Expected Accuracy: {'80-85%' if use_goal_delta else '70-75%'}")
+    print()
     
     try:
-<<<<<<< Updated upstream
-        # Main training with perception mode
-        model, history = main(args.config, perception_mode=args.perception)
-=======
         # Train model
         trainer, history, metrics = train_model(
-            use_goal_delta=not args.basic,
-            config_path=args.config,
+            use_goal_delta=use_goal_delta,
             verbose=True
         )
->>>>>>> Stashed changes
         
-        # Optional: Run additional experiments
-        if args.hyperparameter_tuning or args.architecture_comparison:
-            print("\n" + "=" * 60)
-            print("🔬 ADDITIONAL EXPERIMENTS")
-            print("=" * 60)
+        print(f"\n📋 Detailed Metrics:")
+        print(f"   Precision: {metrics['precision']:.4f}")
+        print(f"   Recall: {metrics['recall']:.4f}")
+        print(f"   F1-Score: {metrics['f1']:.4f}")
         
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        if args.hyperparameter_tuning:
-            print("\n🔧 Running hyperparameter tuning...")
-            best_config, best_acc = hyperparameter_tuning_example()
-=======
+        # Save model
+        model_dir = project_root / "data" / "models"
+        model_dir.mkdir(parents=True, exist_ok=True)
+        
         mode_type = "basic" if args.basic else "goal_aware"
-        model_path = model_dir / f"robot_nav_{mode_type}.pth"
->>>>>>> Stashed changes
-=======
-        mode_type = "basic" if args.basic else "goal_aware"
-        model_path = model_dir / f"robot_nav_{mode_type}.pth"
->>>>>>> Stashed changes
-=======
-        mode_type = "basic" if args.basic else "goal_aware"
-        model_path = model_dir / f"robot_nav_{mode_type}.pth"
->>>>>>> Stashed changes
+        model_path = model_dir / f"robot_navigation_{mode_type}.pth"
         
-        if args.architecture_comparison:
-            print("\n🏗️ Running architecture comparison...")
-            arch_results = compare_architectures()
+        torch.save(trainer.model.state_dict(), model_path)
+        print(f"\n💾 Model saved to: {model_path}")
         
-<<<<<<< Updated upstream
-        print("\n✅ All experiments completed!")
-=======
         # Save training history plot
         vis_dir = project_root / "data" / "results" / "visualizations"
         vis_dir.mkdir(parents=True, exist_ok=True)
-        history_path = vis_dir / f"training_{mode_type}.png"
         
-        trainer.plot_training_history(str(history_path))
-        print(f"📈 Training history saved to: {history_path}")
+        history_path = vis_dir / f"training_history_{mode_type}.png"
         
-        print("\n🎉 Training completed successfully!")
->>>>>>> Stashed changes
+        # Create and save plot
+        import matplotlib.pyplot as plt
         
-    except KeyboardInterrupt:
-        print("\n⏹️ Training interrupted by user")
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+        
+        # Loss plot
+        ax1.plot(history['train_losses'], label='Training Loss')
+        ax1.plot(history['val_losses'], label='Validation Loss')
+        ax1.set_title(f'Loss - {mode_type.title()} Mode')
+        ax1.set_xlabel('Epoch')
+        ax1.set_ylabel('Loss')
+        ax1.legend()
+        ax1.grid(True)
+        
+        # Accuracy plot
+        ax2.plot(history['train_accuracies'], label='Training Accuracy')
+        ax2.plot(history['val_accuracies'], label='Validation Accuracy')
+        ax2.set_title(f'Accuracy - {mode_type.title()} Mode')
+        ax2.set_xlabel('Epoch')
+        ax2.set_ylabel('Accuracy')
+        ax2.legend()
+        ax2.grid(True)
+        
+        plt.tight_layout()
+        plt.savefig(history_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        
+        print(f"📊 Training history plot saved to: {history_path}")
+        print(f"\n✅ Training completed successfully!")
+        
     except Exception as e:
-        print(f"\n❌ Error during training: {e}")
+        print(f"❌ Training failed: {e}")
         import traceback
         traceback.print_exc()
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
