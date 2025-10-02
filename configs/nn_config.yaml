@@ -16,8 +16,8 @@ model:
   input_size: 11             # Will be auto-calculated based on goal_aware setting
   perception_size: 9         # 3×3 perception grid
   goal_features: 2           # goal_delta (dx, dy) features
-  hidden1_size: 64           # First hidden layer neurons
-  hidden2_size: 32           # Second hidden layer neurons  
+  hidden1_size: 128          # First hidden layer neurons
+  hidden2_size: 64           # Second hidden layer neurons  
   output_size: 4             # 4 navigation actions (UP, DOWN, LEFT, RIGHT)
   
   # Activation functions
@@ -25,7 +25,7 @@ model:
   output_activation: "softmax"  # Softmax for output layer
   
   # Regularization
-  dropout_rate: 0.2          # Dropout rate for regularization
+  dropout_rate: 0.15          # Dropout rate for regularization
   weight_decay: 0.001         # L2 regularization (not used in this implementation)
 
 # =============================================================================
@@ -36,7 +36,7 @@ training:
   # Optimization
   learning_rate: 0.0005       # Initial learning rate
   batch_size: 64             # Mini-batch size
-  epochs: 200                # Maximum number of epochs
+  epochs: 300                # Maximum number of epochs
   
   # Early stopping
   early_stopping:
@@ -143,69 +143,9 @@ logging:
 # =============================================================================
 
 experiments:
-  # Hyperparameter tuning
-  hyperparameter_tuning:
-    enabled: false           # Set to true to run hyperparameter tuning
-    param_grid:
-      learning_rate: [0.001, 0.01, 0.1]
-      dropout_rate: [0.1, 0.2, 0.3]
-      hidden1_size: [32, 64, 128]
-      hidden2_size: [16, 32, 64]
-  
-  # Architecture comparison
-  architecture_comparison:
-    enabled: false           # Set to true to compare architectures
-    architectures:
-      - name: "Small"
-        hidden1_size: 32
-        hidden2_size: 16
-      - name: "Medium" 
-        hidden1_size: 64
-        hidden2_size: 32
-      - name: "Large"
-        hidden1_size: 128
-        hidden2_size: 64
+  # Future experimental features can be added here
+  enabled: false
 
-# =============================================================================
-# BIOLOGICAL INSPIRATION NOTES
-# =============================================================================
-
-biological_notes: |
-  🧠 BIOLOGICAL CONNECTIONS:
-  
-  - Local Perception: 3×3 grid mimics animal peripheral vision
-  - ReLU Activation: Mimics spiking neurons (active/silent states)
-  - Dropout: Simulates neural noise and robustness
-  - Softmax: Mimics neural competition for activation
-  - Pattern Learning: Robot learns obstacle-action relationships
-  
-  🧬 NEUROSCIENCE PRINCIPLES:
-  
-  - Sparse Activation: ReLU creates sparse representations
-  - Gradient Flow: ReLU prevents vanishing gradients
-  - Regularization: Dropout prevents overfitting
-  - Competition: Softmax ensures only one action is selected
-  - Learning: Backpropagation mimics synaptic plasticity
-
-# =============================================================================
-# MATHEMATICAL FOUNDATION
-# =============================================================================
-
-mathematical_notes: |
-  📐 KEY EQUATIONS:
-  
-  - ReLU: f(x) = max(0, x)
-  - Softmax: p_i = exp(z_i) / Σ exp(z_j)
-  - Cross-entropy: L = -Σ y_i log(p_i)
-  - Dropout: x' = x * mask / (1-p)
-  - Xavier Init: std = sqrt(2 / (fan_in + fan_out))
-  
-  🎯 OPTIMIZATION:
-  
-  - Gradient Descent: θ = θ - α∇L
-  - Mini-batch: Process data in small batches
-  - Early Stopping: Prevent overfitting
-  - Regularization: Dropout for generalization
 
 # =============================================================================
 # PERCEPTION MODE CONFIGURATIONS
@@ -261,3 +201,4 @@ usage_notes: |
   - Use Goal-Aware mode for optimal performance (compass-like navigation)
   - Use Basic mode for comparison or resource-constrained scenarios
   - Goal-aware mode provides direction awareness like animal navigation
+

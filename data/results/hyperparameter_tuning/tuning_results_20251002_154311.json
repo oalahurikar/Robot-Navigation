@@ -1,0 +1,278 @@
+{
+  "results": [
+    {
+      "params": {
+        "hidden1_size": 256,
+        "hidden2_size": 128,
+        "dropout_rate": 0.1,
+        "learning_rate": 0.001,
+        "batch_size": 32,
+        "early_stopping_patience": 30
+      },
+      "error": "create_trainer() takes 2 positional arguments but 3 were given",
+      "timestamp": "2025-10-02T15:43:08.976763"
+    },
+    {
+      "params": {
+        "hidden1_size": 256,
+        "hidden2_size": 128,
+        "dropout_rate": 0.1,
+        "learning_rate": 0.001,
+        "batch_size": 32,
+        "early_stopping_patience": 40
+      },
+      "error": "create_trainer() takes 2 positional arguments but 3 were given",
+      "timestamp": "2025-10-02T15:43:09.088214"
+    },
+    {
+      "params": {
+        "hidden1_size": 256,
+        "hidden2_size": 128,
+        "dropout_rate": 0.1,
+        "learning_rate": 0.001,
+        "batch_size": 32,
+        "early_stopping_patience": 55
+      },
+      "error": "create_trainer() takes 2 positional arguments but 3 were given",
+      "timestamp": "2025-10-02T15:43:09.199541"
+    },
+    {
+      "params": {
+        "hidden1_size": 256,
+        "hidden2_size": 128,
+        "dropout_rate": 0.1,
+        "learning_rate": 0.001,
+        "batch_size": 64,
+        "early_stopping_patience": 30
+      },
+      "error": "create_trainer() takes 2 positional arguments but 3 were given",
+      "timestamp": "2025-10-02T15:43:09.312610"
+    },
+    {
+      "params": {
+        "hidden1_size": 256,
+        "hidden2_size": 128,
+        "dropout_rate": 0.1,
+        "learning_rate": 0.001,
+        "batch_size": 64,
+        "early_stopping_patience": 40
+      },
+      "error": "create_trainer() takes 2 positional arguments but 3 were given",
+      "timestamp": "2025-10-02T15:43:09.424816"
+    },
+    {
+      "params": {
+        "hidden1_size": 256,
+        "hidden2_size": 128,
+        "dropout_rate": 0.1,
+        "learning_rate": 0.001,
+        "batch_size": 64,
+        "early_stopping_patience": 55
+      },
+      "error": "create_trainer() takes 2 positional arguments but 3 were given",
+      "timestamp": "2025-10-02T15:43:09.539128"
+    },
+    {
+      "params": {
+        "hidden1_size": 256,
+        "hidden2_size": 128,
+        "dropout_rate": 0.1,
+        "learning_rate": 0.001,
+        "batch_size": 128,
+        "early_stopping_patience": 30
+      },
+      "error": "create_trainer() takes 2 positional arguments but 3 were given",
+      "timestamp": "2025-10-02T15:43:09.651990"
+    },
+    {
+      "params": {
+        "hidden1_size": 256,
+        "hidden2_size": 128,
+        "dropout_rate": 0.1,
+        "learning_rate": 0.001,
+        "batch_size": 128,
+        "early_stopping_patience": 40
+      },
+      "error": "create_trainer() takes 2 positional arguments but 3 were given",
+      "timestamp": "2025-10-02T15:43:09.774351"
+    },
+    {
+      "params": {
+        "hidden1_size": 256,
+        "hidden2_size": 128,
+        "dropout_rate": 0.1,
+        "learning_rate": 0.001,
+        "batch_size": 128,
+        "early_stopping_patience": 55
+      },
+      "error": "create_trainer() takes 2 positional arguments but 3 were given",
+      "timestamp": "2025-10-02T15:43:09.894928"
+    },
+    {
+      "params": {
+        "hidden1_size": 256,
+        "hidden2_size": 128,
+        "dropout_rate": 0.1,
+        "learning_rate": 0.002,
+        "batch_size": 32,
+        "early_stopping_patience": 30
+      },
+      "error": "create_trainer() takes 2 positional arguments but 3 were given",
+      "timestamp": "2025-10-02T15:43:10.035112"
+    },
+    {
+      "params": {
+        "hidden1_size": 256,
+        "hidden2_size": 128,
+        "dropout_rate": 0.1,
+        "learning_rate": 0.002,
+        "batch_size": 32,
+        "early_stopping_patience": 40
+      },
+      "error": "create_trainer() takes 2 positional arguments but 3 were given",
+      "timestamp": "2025-10-02T15:43:10.149207"
+    },
+    {
+      "params": {
+        "hidden1_size": 256,
+        "hidden2_size": 128,
+        "dropout_rate": 0.1,
+        "learning_rate": 0.002,
+        "batch_size": 32,
+        "early_stopping_patience": 55
+      },
+      "error": "create_trainer() takes 2 positional arguments but 3 were given",
+      "timestamp": "2025-10-02T15:43:10.260306"
+    },
+    {
+      "params": {
+        "hidden1_size": 256,
+        "hidden2_size": 128,
+        "dropout_rate": 0.1,
+        "learning_rate": 0.002,
+        "batch_size": 64,
+        "early_stopping_patience": 30
+      },
+      "error": "create_trainer() takes 2 positional arguments but 3 were given",
+      "timestamp": "2025-10-02T15:43:10.371168"
+    },
+    {
+      "params": {
+        "hidden1_size": 256,
+        "hidden2_size": 128,
+        "dropout_rate": 0.1,
+        "learning_rate": 0.002,
+        "batch_size": 64,
+        "early_stopping_patience": 40
+      },
+      "error": "create_trainer() takes 2 positional arguments but 3 were given",
+      "timestamp": "2025-10-02T15:43:10.483501"
+    },
+    {
+      "params": {
+        "hidden1_size": 256,
+        "hidden2_size": 128,
+        "dropout_rate": 0.1,
+        "learning_rate": 0.002,
+        "batch_size": 64,
+        "early_stopping_patience": 55
+      },
+      "error": "create_trainer() takes 2 positional arguments but 3 were given",
+      "timestamp": "2025-10-02T15:43:10.594923"
+    },
+    {
+      "params": {
+        "hidden1_size": 256,
+        "hidden2_size": 128,
+        "dropout_rate": 0.1,
+        "learning_rate": 0.002,
+        "batch_size": 128,
+        "early_stopping_patience": 30
+      },
+      "error": "create_trainer() takes 2 positional arguments but 3 were given",
+      "timestamp": "2025-10-02T15:43:10.727289"
+    },
+    {
+      "params": {
+        "hidden1_size": 256,
+        "hidden2_size": 128,
+        "dropout_rate": 0.1,
+        "learning_rate": 0.002,
+        "batch_size": 128,
+        "early_stopping_patience": 40
+      },
+      "error": "create_trainer() takes 2 positional arguments but 3 were given",
+      "timestamp": "2025-10-02T15:43:10.845102"
+    },
+    {
+      "params": {
+        "hidden1_size": 256,
+        "hidden2_size": 128,
+        "dropout_rate": 0.1,
+        "learning_rate": 0.002,
+        "batch_size": 128,
+        "early_stopping_patience": 55
+      },
+      "error": "create_trainer() takes 2 positional arguments but 3 were given",
+      "timestamp": "2025-10-02T15:43:10.956414"
+    },
+    {
+      "params": {
+        "hidden1_size": 256,
+        "hidden2_size": 128,
+        "dropout_rate": 0.15,
+        "learning_rate": 0.001,
+        "batch_size": 32,
+        "early_stopping_patience": 30
+      },
+      "error": "create_trainer() takes 2 positional arguments but 3 were given",
+      "timestamp": "2025-10-02T15:43:11.067540"
+    },
+    {
+      "params": {
+        "hidden1_size": 256,
+        "hidden2_size": 128,
+        "dropout_rate": 0.15,
+        "learning_rate": 0.001,
+        "batch_size": 32,
+        "early_stopping_patience": 40
+      },
+      "error": "create_trainer() takes 2 positional arguments but 3 were given",
+      "timestamp": "2025-10-02T15:43:11.177762"
+    }
+  ],
+  "best_config": null,
+  "best_accuracy": 0.0,
+  "param_grid": {
+    "hidden1_size": [
+      64,
+      128,
+      256
+    ],
+    "hidden2_size": [
+      32,
+      64,
+      128
+    ],
+    "dropout_rate": [
+      0.1,
+      0.15,
+      0.2
+    ],
+    "learning_rate": [
+      0.0005,
+      0.001,
+      0.002
+    ],
+    "batch_size": [
+      32,
+      64,
+      128
+    ],
+    "early_stopping_patience": [
+      30,
+      40,
+      55
+    ]
+  }
+}

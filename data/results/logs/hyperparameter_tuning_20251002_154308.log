@@ -1,0 +1,98 @@
+2025-10-02 15:43:08,799 - INFO - 🚀 Starting hyperparameter tuning session
+2025-10-02 15:43:08,799 - INFO - 📊 Generated 486 hyperparameter combinations
+2025-10-02 15:43:08,799 - INFO - 🎯 Running 30 hyperparameter combinations
+2025-10-02 15:43:08,799 - INFO - 📊 Progress: 1/30
+2025-10-02 15:43:08,799 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.001, 'batch_size': 32, 'early_stopping_patience': 30}
+2025-10-02 15:43:08,976 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.001, 'batch_size': 32, 'early_stopping_patience': 30}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:08,976 - INFO - 📊 Progress: 2/30
+2025-10-02 15:43:08,976 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.001, 'batch_size': 32, 'early_stopping_patience': 40}
+2025-10-02 15:43:09,088 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.001, 'batch_size': 32, 'early_stopping_patience': 40}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:09,088 - INFO - 📊 Progress: 3/30
+2025-10-02 15:43:09,088 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.001, 'batch_size': 32, 'early_stopping_patience': 55}
+2025-10-02 15:43:09,199 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.001, 'batch_size': 32, 'early_stopping_patience': 55}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:09,199 - INFO - 📊 Progress: 4/30
+2025-10-02 15:43:09,199 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.001, 'batch_size': 64, 'early_stopping_patience': 30}
+2025-10-02 15:43:09,312 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.001, 'batch_size': 64, 'early_stopping_patience': 30}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:09,312 - INFO - 📊 Progress: 5/30
+2025-10-02 15:43:09,312 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.001, 'batch_size': 64, 'early_stopping_patience': 40}
+2025-10-02 15:43:09,424 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.001, 'batch_size': 64, 'early_stopping_patience': 40}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:09,424 - INFO - 📊 Progress: 6/30
+2025-10-02 15:43:09,424 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.001, 'batch_size': 64, 'early_stopping_patience': 55}
+2025-10-02 15:43:09,539 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.001, 'batch_size': 64, 'early_stopping_patience': 55}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:09,539 - INFO - 📊 Progress: 7/30
+2025-10-02 15:43:09,539 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.001, 'batch_size': 128, 'early_stopping_patience': 30}
+2025-10-02 15:43:09,651 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.001, 'batch_size': 128, 'early_stopping_patience': 30}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:09,652 - INFO - 📊 Progress: 8/30
+2025-10-02 15:43:09,652 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.001, 'batch_size': 128, 'early_stopping_patience': 40}
+2025-10-02 15:43:09,774 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.001, 'batch_size': 128, 'early_stopping_patience': 40}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:09,774 - INFO - 📊 Progress: 9/30
+2025-10-02 15:43:09,774 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.001, 'batch_size': 128, 'early_stopping_patience': 55}
+2025-10-02 15:43:09,894 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.001, 'batch_size': 128, 'early_stopping_patience': 55}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:09,895 - INFO - 📊 Progress: 10/30
+2025-10-02 15:43:09,895 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.002, 'batch_size': 32, 'early_stopping_patience': 30}
+2025-10-02 15:43:10,035 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.002, 'batch_size': 32, 'early_stopping_patience': 30}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:10,035 - INFO - 💾 Results saved to data/results/hyperparameter_tuning/tuning_results_20251002_154310.json
+2025-10-02 15:43:10,035 - INFO - 📊 Progress: 11/30
+2025-10-02 15:43:10,035 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.002, 'batch_size': 32, 'early_stopping_patience': 40}
+2025-10-02 15:43:10,149 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.002, 'batch_size': 32, 'early_stopping_patience': 40}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:10,149 - INFO - 📊 Progress: 12/30
+2025-10-02 15:43:10,149 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.002, 'batch_size': 32, 'early_stopping_patience': 55}
+2025-10-02 15:43:10,260 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.002, 'batch_size': 32, 'early_stopping_patience': 55}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:10,260 - INFO - 📊 Progress: 13/30
+2025-10-02 15:43:10,260 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.002, 'batch_size': 64, 'early_stopping_patience': 30}
+2025-10-02 15:43:10,371 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.002, 'batch_size': 64, 'early_stopping_patience': 30}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:10,371 - INFO - 📊 Progress: 14/30
+2025-10-02 15:43:10,371 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.002, 'batch_size': 64, 'early_stopping_patience': 40}
+2025-10-02 15:43:10,483 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.002, 'batch_size': 64, 'early_stopping_patience': 40}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:10,483 - INFO - 📊 Progress: 15/30
+2025-10-02 15:43:10,483 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.002, 'batch_size': 64, 'early_stopping_patience': 55}
+2025-10-02 15:43:10,594 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.002, 'batch_size': 64, 'early_stopping_patience': 55}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:10,594 - INFO - 📊 Progress: 16/30
+2025-10-02 15:43:10,595 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.002, 'batch_size': 128, 'early_stopping_patience': 30}
+2025-10-02 15:43:10,727 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.002, 'batch_size': 128, 'early_stopping_patience': 30}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:10,727 - INFO - 📊 Progress: 17/30
+2025-10-02 15:43:10,727 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.002, 'batch_size': 128, 'early_stopping_patience': 40}
+2025-10-02 15:43:10,845 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.002, 'batch_size': 128, 'early_stopping_patience': 40}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:10,845 - INFO - 📊 Progress: 18/30
+2025-10-02 15:43:10,845 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.002, 'batch_size': 128, 'early_stopping_patience': 55}
+2025-10-02 15:43:10,956 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.1, 'learning_rate': 0.002, 'batch_size': 128, 'early_stopping_patience': 55}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:10,956 - INFO - 📊 Progress: 19/30
+2025-10-02 15:43:10,956 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.001, 'batch_size': 32, 'early_stopping_patience': 30}
+2025-10-02 15:43:11,067 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.001, 'batch_size': 32, 'early_stopping_patience': 30}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:11,067 - INFO - 📊 Progress: 20/30
+2025-10-02 15:43:11,067 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.001, 'batch_size': 32, 'early_stopping_patience': 40}
+2025-10-02 15:43:11,177 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.001, 'batch_size': 32, 'early_stopping_patience': 40}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:11,178 - INFO - 💾 Results saved to data/results/hyperparameter_tuning/tuning_results_20251002_154311.json
+2025-10-02 15:43:11,178 - INFO - 📊 Progress: 21/30
+2025-10-02 15:43:11,178 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.001, 'batch_size': 32, 'early_stopping_patience': 55}
+2025-10-02 15:43:11,288 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.001, 'batch_size': 32, 'early_stopping_patience': 55}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:11,288 - INFO - 📊 Progress: 22/30
+2025-10-02 15:43:11,288 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.001, 'batch_size': 64, 'early_stopping_patience': 30}
+2025-10-02 15:43:11,399 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.001, 'batch_size': 64, 'early_stopping_patience': 30}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:11,399 - INFO - 📊 Progress: 23/30
+2025-10-02 15:43:11,399 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.001, 'batch_size': 64, 'early_stopping_patience': 40}
+2025-10-02 15:43:11,509 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.001, 'batch_size': 64, 'early_stopping_patience': 40}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:11,509 - INFO - 📊 Progress: 24/30
+2025-10-02 15:43:11,509 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.001, 'batch_size': 64, 'early_stopping_patience': 55}
+2025-10-02 15:43:11,619 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.001, 'batch_size': 64, 'early_stopping_patience': 55}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:11,619 - INFO - 📊 Progress: 25/30
+2025-10-02 15:43:11,619 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.001, 'batch_size': 128, 'early_stopping_patience': 30}
+2025-10-02 15:43:11,730 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.001, 'batch_size': 128, 'early_stopping_patience': 30}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:11,730 - INFO - 📊 Progress: 26/30
+2025-10-02 15:43:11,730 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.001, 'batch_size': 128, 'early_stopping_patience': 40}
+2025-10-02 15:43:11,840 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.001, 'batch_size': 128, 'early_stopping_patience': 40}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:11,840 - INFO - 📊 Progress: 27/30
+2025-10-02 15:43:11,840 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.001, 'batch_size': 128, 'early_stopping_patience': 55}
+2025-10-02 15:43:11,950 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.001, 'batch_size': 128, 'early_stopping_patience': 55}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:11,950 - INFO - 📊 Progress: 28/30
+2025-10-02 15:43:11,950 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.002, 'batch_size': 32, 'early_stopping_patience': 30}
+2025-10-02 15:43:12,060 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.002, 'batch_size': 32, 'early_stopping_patience': 30}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:12,061 - INFO - 📊 Progress: 29/30
+2025-10-02 15:43:12,061 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.002, 'batch_size': 32, 'early_stopping_patience': 40}
+2025-10-02 15:43:12,171 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.002, 'batch_size': 32, 'early_stopping_patience': 40}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:12,172 - INFO - 📊 Progress: 30/30
+2025-10-02 15:43:12,172 - INFO - 🧪 Testing configuration: {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.002, 'batch_size': 32, 'early_stopping_patience': 55}
+2025-10-02 15:43:12,282 - ERROR - ❌ Error testing configuration {'hidden1_size': 256, 'hidden2_size': 128, 'dropout_rate': 0.15, 'learning_rate': 0.002, 'batch_size': 32, 'early_stopping_patience': 55}: create_trainer() takes 2 positional arguments but 3 were given
+2025-10-02 15:43:12,283 - INFO - 💾 Results saved to data/results/hyperparameter_tuning/tuning_results_20251002_154312.json
+2025-10-02 15:43:12,283 - INFO - 💾 Results saved to data/results/hyperparameter_tuning/tuning_results_20251002_154312.json
+2025-10-02 15:43:12,283 - WARNING - No successful results to analyze
