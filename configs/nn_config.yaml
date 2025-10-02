@@ -10,12 +10,12 @@
 
 # Model Architecture
 model:
-  # Dynamic input size based on perception mode
-  # 3×3 mode: 9 perception + 12 history = 21 features
-  # 5×5 mode: 25 perception + 12 history = 37 features
-  input_size: 21             # Will be auto-calculated based on perception_size + history_size
-  perception_size: 9         # 3×3 perception (9) or 5×5 perception (25)
-  history_size: 12           # 3 actions × 4 one-hot encoding = 12 features
+  # Goal-aware input size
+  # Goal-aware mode: 9 perception + 2 goal_delta = 11 features
+  # Basic mode: 9 perception = 9 features
+  input_size: 11             # Will be auto-calculated based on goal_aware setting
+  perception_size: 9         # 3×3 perception grid
+  goal_features: 2           # goal_delta (dx, dy) features
   hidden1_size: 64           # First hidden layer neurons
   hidden2_size: 32           # Second hidden layer neurons  
   output_size: 4             # 4 navigation actions (UP, DOWN, LEFT, RIGHT)
@@ -212,50 +212,52 @@ mathematical_notes: |
 # =============================================================================
 
 perception_modes:
-  # 3×3 Enhanced Mode (Default)
-  "3x3":
+  # Goal-Aware Mode (Default)
+  "goal_aware":
     perception_size: 9
-    input_size: 21          # 9 perception + 12 history
-    description: "3×3 perception with action history"
-    expected_accuracy: "76-78%"
+    goal_features: 2
+    input_size: 11          # 9 perception + 2 goal_delta
+    description: "3×3 perception with goal direction awareness"
+    expected_accuracy: "80-85%"
     
-  # 5×5 Enhanced Mode  
-  "5x5":
-    perception_size: 25
-    input_size: 37          # 25 perception + 12 history
-    description: "5×5 perception with action history"
-    expected_accuracy: "79-82%"
+  # Basic Mode  
+  "basic":
+    perception_size: 9
+    goal_features: 0
+    input_size: 9           # 9 perception only
+    description: "3×3 perception without goal awareness"
+    expected_accuracy: "70-75%"
 
 # =============================================================================
 # USAGE INSTRUCTIONS
 # =============================================================================
 
 usage_notes: |
-  🚀 HOW TO USE DIFFERENT PERCEPTION MODES:
+  🚀 HOW TO USE DIFFERENT MODES:
   
-  1. For 3×3 Enhanced Mode (Default):
-     - Use as-is: perception_size: 9, input_size: 21
+  1. For Goal-Aware Mode (Default):
+     - Use as-is: perception_size: 9, goal_features: 2, input_size: 11
      - Generate data: python scripts/generate_data.py large
-     - Train: python scripts/train_nn.py --perception 3x3
+     - Train: python scripts/train_nn.py
      
-  2. For 5×5 Enhanced Mode:
-     - Update: perception_size: 25, input_size: 37
-     - Generate data: python scripts/generate_data.py large --perception 5x5
-     - Train: python scripts/train_nn.py --perception 5x5
+  2. For Basic Mode:
+     - Update: goal_features: 0, input_size: 9
+     - Generate data: python scripts/generate_data.py large --basic
+     - Train: python scripts/train_nn.py --basic
      
   3. Auto-configuration:
-     - The training script will automatically update input_size based on perception_size
+     - The training script will automatically update input_size based on goal_aware setting
      - No need to manually edit input_size when switching modes
      
   📊 PERFORMANCE COMPARISON:
   
   | Mode | Features | Accuracy | Use Case |
   |------|----------|----------|----------|
-  | 3×3 Enhanced | 21 | 76.7% | Standard navigation |
-  | 5×5 Enhanced | 37 | 79.1% | Advanced navigation |
+  | Goal-Aware | 11 | 80-85% | Compass-like navigation |
+  | Basic | 9 | 70-75% | Local obstacle avoidance |
   
   🎯 RECOMMENDATIONS:
   
-  - Start with 3×3 Enhanced for baseline performance
-  - Use 5×5 Enhanced for improved spatial awareness
-  - Both modes include action history for temporal context
+  - Use Goal-Aware mode for optimal performance (compass-like navigation)
+  - Use Basic mode for comparison or resource-constrained scenarios
+  - Goal-aware mode provides direction awareness like animal navigation

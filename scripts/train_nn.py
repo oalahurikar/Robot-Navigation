@@ -35,25 +35,62 @@ from core.data_generation import load_training_data
 # CONFIGURATION LOADING
 # =============================================================================
 
+<<<<<<< Updated upstream
 def load_config(config_path: str = None) -> dict:
+=======
+def get_dataset_filename(use_goal_delta: bool = True) -> str:
+>>>>>>> Stashed changes
     """
     Load configuration from YAML file
     
     Args:
+<<<<<<< Updated upstream
         config_path: Path to configuration file
         
+=======
+        use_goal_delta: True for goal-aware mode, False for basic mode
+    
+>>>>>>> Stashed changes
     Returns:
         Configuration dictionary
     """
+<<<<<<< Updated upstream
     if config_path is None:
         config_path = project_root / "configs" / "nn_config.yaml"
     
+=======
+    if use_goal_delta:
+        return "large_training_dataset.npz"  # Goal-aware mode (default)
+    else:
+        return "large_training_dataset_basic.npz"  # Basic mode
+
+def load_data(use_goal_delta: bool = True, verbose: bool = True):
+    """
+    Load training data with automatic mode detection
+    
+    Args:
+        use_goal_delta: True for goal-aware mode, False for basic mode
+        verbose: Print loading information
+    
+    Returns:
+        X, y, metadata, is_goal_aware
+    """
+    # Get filename
+    data_filename = get_dataset_filename(use_goal_delta)
+    data_path = project_root / "data" / "raw" / data_filename
+    
+    if verbose:
+        print(f"📂 Loading data: {data_filename}")
+    
+    # Load data
+>>>>>>> Stashed changes
     try:
         with open(config_path, 'r') as f:
             config = yaml.safe_load(f)
         print(f"✅ Configuration loaded from {config_path}")
         return config
     except FileNotFoundError:
+<<<<<<< Updated upstream
         print(f"❌ Configuration file not found: {config_path}")
         print("💡 Using default configuration...")
         return get_default_config()
@@ -61,6 +98,27 @@ def load_config(config_path: str = None) -> dict:
         print(f"❌ Error parsing YAML configuration: {e}")
         print("💡 Using default configuration...")
         return get_default_config()
+=======
+        print(f"❌ Data file not found: {data_filename}")
+        print(f"💡 Generate data first with:")
+        if use_goal_delta:
+            print(f"   python scripts/generate_data.py large")
+        else:
+            print(f"   python scripts/generate_data.py large --basic")
+        raise
+    
+    # Detect mode from data
+    feature_count = X.shape[1]
+    is_goal_aware = feature_count == 11
+    
+    if verbose:
+        mode_type = "Goal-Aware 🎯" if is_goal_aware else "Basic"
+        print(f"✅ Data loaded: {X.shape[0]} samples")
+        print(f"   Features: {X.shape[1]} ({mode_type})")
+        print(f"   Environments: {len(metadata)}")
+    
+    return X, y, metadata, is_goal_aware
+>>>>>>> Stashed changes
 
 def get_default_config() -> dict:
     """Get default configuration if YAML file is not available"""
@@ -101,11 +159,18 @@ DATA_PATH = project_root / "data" / "raw" / "small_training_dataset.npz"
 # MAIN TRAINING FUNCTION
 # =============================================================================
 
+<<<<<<< Updated upstream
 def main(config_path: str = None, perception_mode: str = "3x3"):
+=======
+def train_model(use_goal_delta: bool = True,
+                config_path: str = None,
+                verbose: bool = True):
+>>>>>>> Stashed changes
     """
     Main training pipeline
     
     Args:
+<<<<<<< Updated upstream
         config_path: Path to configuration file
         perception_mode: "3x3" or "5x5" perception mode
     """
@@ -133,6 +198,26 @@ def main(config_path: str = None, perception_mode: str = "3x3"):
         print(f"❌ Data file not found: {DATA_PATH}")
         print("💡 Run 'python scripts/generate_data.py' first to generate training data")
         return
+=======
+        use_goal_delta: True for goal-aware mode, False for basic mode
+        config_path: Path to config file (None = default)
+        verbose: Print training progress
+    
+    Returns:
+        trainer, history, test_metrics
+    """
+    if verbose:
+        print("🚀 ROBOT NAVIGATION NEURAL NETWORK TRAINING")
+        print("=" * 60)
+        print(f"   Mode: {'Goal-Aware' if use_goal_delta else 'Basic'}")
+        print(f"   Features: {'11 (9 perception + 2 goal_delta)' if use_goal_delta else '9 (perception only)'}")
+    
+    # 1. Load configuration
+    config = load_config(goal_aware=use_goal_delta)
+    
+    # 2. Load data
+    X, y, metadata, is_goal_aware = load_data(use_goal_delta, verbose)
+>>>>>>> Stashed changes
     
     # 3. Create data loaders
     print("\n📊 Creating data loaders...")
@@ -378,6 +463,11 @@ if __name__ == "__main__":
     """
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='Train Robot Navigation Neural Network')
+<<<<<<< Updated upstream
+=======
+    parser.add_argument('--basic', action='store_true',
+                       help='Use basic mode (9 features) instead of goal-aware mode (11 features)')
+>>>>>>> Stashed changes
     parser.add_argument('--config', type=str, default=None,
                        help='Path to configuration file (default: configs/nn_config.yaml)')
     parser.add_argument('--perception', choices=['3x3', '5x5'], default='3x3',
@@ -395,8 +485,17 @@ if __name__ == "__main__":
         print(f"🎯 Using unified config with {args.perception} perception mode: {args.config}")
     
     try:
+<<<<<<< Updated upstream
         # Main training with perception mode
         model, history = main(args.config, perception_mode=args.perception)
+=======
+        # Train model
+        trainer, history, metrics = train_model(
+            use_goal_delta=not args.basic,
+            config_path=args.config,
+            verbose=True
+        )
+>>>>>>> Stashed changes
         
         # Optional: Run additional experiments
         if args.hyperparameter_tuning or args.architecture_comparison:
@@ -404,15 +503,32 @@ if __name__ == "__main__":
             print("🔬 ADDITIONAL EXPERIMENTS")
             print("=" * 60)
         
+<<<<<<< Updated upstream
         if args.hyperparameter_tuning:
             print("\n🔧 Running hyperparameter tuning...")
             best_config, best_acc = hyperparameter_tuning_example()
+=======
+        mode_type = "basic" if args.basic else "goal_aware"
+        model_path = model_dir / f"robot_nav_{mode_type}.pth"
+>>>>>>> Stashed changes
         
         if args.architecture_comparison:
             print("\n🏗️ Running architecture comparison...")
             arch_results = compare_architectures()
         
+<<<<<<< Updated upstream
         print("\n✅ All experiments completed!")
+=======
+        # Save training history plot
+        vis_dir = project_root / "data" / "results" / "visualizations"
+        vis_dir.mkdir(parents=True, exist_ok=True)
+        history_path = vis_dir / f"training_{mode_type}.png"
+        
+        trainer.plot_training_history(str(history_path))
+        print(f"📈 Training history saved to: {history_path}")
+        
+        print("\n🎉 Training completed successfully!")
+>>>>>>> Stashed changes
         
     except KeyboardInterrupt:
         print("\n⏹️ Training interrupted by user")

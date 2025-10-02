@@ -420,13 +420,13 @@ class RobotNavigationTrainer:
 # CONFIGURATION LOADING
 # =============================================================================
 
-def load_config(config_path: str = None, perception_mode: str = "3x3") -> dict:
+def load_config(config_path: str = None, goal_aware: bool = True) -> dict:
     """
-    Load configuration from YAML file and update for perception mode
+    Load configuration from YAML file and update for goal-aware mode
     
     Args:
         config_path: Path to configuration file
-        perception_mode: "3x3" or "5x5" perception mode
+        goal_aware: If True, use goal-aware mode (11 features), else basic mode (9 features)
         
     Returns:
         Configuration dictionary with updated parameters
@@ -439,8 +439,8 @@ def load_config(config_path: str = None, perception_mode: str = "3x3") -> dict:
             config = yaml.safe_load(f)
         print(f"✅ Configuration loaded from {config_path}")
         
-        # Update config for perception mode
-        config = update_config_for_perception_mode(config, perception_mode)
+        # Update config for goal-aware mode
+        config = update_config_for_goal_aware_mode(config, goal_aware)
         return config
         
     except FileNotFoundError:
@@ -453,31 +453,29 @@ def load_config(config_path: str = None, perception_mode: str = "3x3") -> dict:
         return get_default_config()
 
 
-def update_config_for_perception_mode(config: dict, perception_mode: str) -> dict:
+def update_config_for_goal_aware_mode(config: dict, goal_aware: bool) -> dict:
     """
-    Update configuration for specific perception mode
+    Update configuration for goal-aware mode
     
     Args:
         config: Configuration dictionary
-        perception_mode: "3x3" or "5x5"
+        goal_aware: If True, use goal-aware mode (11 features), else basic mode (9 features)
         
     Returns:
         Updated configuration dictionary
     """
-    if perception_mode == "5x5":
-        # 5×5 Enhanced Mode
-        config['model']['perception_size'] = 25
-        config['model']['input_size'] = 37  # 25 perception + 12 history
-        print("🎯 Updated config for 5×5 Enhanced Mode (37 features)")
-    elif perception_mode == "3x3":
-        # 3×3 Enhanced Mode (default)
+    if goal_aware:
+        # Goal-aware mode: 9 perception + 2 goal_delta
         config['model']['perception_size'] = 9
-        config['model']['input_size'] = 21  # 9 perception + 12 history
-        print("🎯 Updated config for 3×3 Enhanced Mode (21 features)")
+        config['model']['goal_features'] = 2
+        config['model']['input_size'] = 11
+        print("🎯 Updated config for Goal-Aware Mode (11 features)")
     else:
-        print(f"⚠️  Unknown perception mode: {perception_mode}, using 3×3")
+        # Basic mode: 9 perception only
         config['model']['perception_size'] = 9
-        config['model']['input_size'] = 21
+        config['model']['goal_features'] = 0
+        config['model']['input_size'] = 9
+        print("🎯 Updated config for Basic Mode (9 features)")
     
     return config
 
@@ -485,7 +483,9 @@ def get_default_config() -> dict:
     """Get default configuration if YAML file is not available"""
     return {
         'model': {
-            'input_size': 9,
+            'input_size': 11,
+            'perception_size': 9,
+            'goal_features': 2,
             'hidden1_size': 64,
             'hidden2_size': 32,
             'output_size': 4,
